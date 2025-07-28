@@ -18,7 +18,7 @@ export interface Room {
   roomPass: string;
   players: Record<string, Player>; //Record<string, Player> just means: “an object where every key is a string, and the value is a Player
   sentence: string;
-  timeLeft: number;
+  time: number;
 }
 
 export type messageTypes =
@@ -28,6 +28,7 @@ export type messageTypes =
       roomPass: string;
       gamerId: string;
       time: number;
+      typeOF_sen: string; //the type of sentences he wants to practice on
     }
   | {
       type: "TOKEN_JOIN";
@@ -55,4 +56,9 @@ export type messageTypes =
       type: "ERROR";
       timestamp: number;
       uuid: string;
+    }
+  | {
+      type: "RESIGN";
+      roomId: string;
+      playerId: string;
     };

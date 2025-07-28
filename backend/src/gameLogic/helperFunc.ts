@@ -14,3 +14,14 @@ export function fuzzyCheck(actual: string, typed: string): number {
 export function sendJSON(ws: WebSocket, obj: object) {
   ws.send(JSON.stringify(obj));
 }
+
+export function checkChar(typeChar: string, actualChar: string): number {
+  if (typeChar === actualChar)
+    return 1; //truee
+  else return 0;
+}
+
+export function generatePara(prompt: string): string {
+  let sentence = "abc";
+  return sentence; //shitty shit
+}

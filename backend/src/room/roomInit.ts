@@ -8,7 +8,7 @@ export class room_Init implements Room {
     public readonly roomId: string,
     public readonly roomPass: string,
     public sentence: string,
-    public timeLeft: number,
+    public time: number,
     public player: Player,
   ) {
     this.players[player.gamerId] = player;

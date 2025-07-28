@@ -61,6 +61,6 @@ export function player_Init(
   uuid: string,
 ): Player {
   const new_player = new Player(gamerId, connection, uuid);
-
+  new_player.setIsAlive("alive");
   return new_player;
 }

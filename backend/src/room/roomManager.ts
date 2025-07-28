@@ -15,6 +15,7 @@ export class RoomManager {
   }
 
   delete(roomId: string) {
+    // or map.delete and map builtin func lowkey i fogot about them and made this shit
     this.rooms.delete(roomId);
   }
 
@@ -24,6 +25,21 @@ export class RoomManager {
 
   addPlayer(room: Room, gamerId: string, player: Player) {
     room.players[gamerId] = player;
+  }
+
+  restart(roomId: string) {
+    const room = this.rooms.get(roomId);
+    if (!room) {
+      return;
+    }
+    room.sentence = ""; ///                       regenerate some sentence using groq or some shite
+    for (const playerId in room.players) {
+      const player = room.players[playerId];
+      player.cursor = 0;
+      player.typed = "";
+      player.typeSpeed = 0;
+      player.state.isAlive = "alive";
+    }
   }
 
   getOpponentId(room: Room, playerId: string): string | null {

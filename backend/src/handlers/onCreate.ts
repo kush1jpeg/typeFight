@@ -1,0 +1,33 @@
+import { WebSocket } from "ws";
+import { player_Init } from "../player/playerInit";
+import { generatePara, sendJSON } from "../gameLogic/helperFunc";
+import { RoomManager } from "../room/roomManager";
+import { room_Init } from "../room/roomInit";
+import { messageTypes } from "../types";
+
+export default function handleCreate(
+  connection: WebSocket,
+  uuid: string,
+  data:Extract<messageTypes, { type: "TOKEN_CREATE" }> , 
+  roomManager: RoomManager,
+) {
+
+  let newPlayer = player_Init(data.gamerId, connection, uuid);
+  const sentence = generatePara(""); //generate sentences through groq;
+  const room = new room_Init(
+    data.roomId,
+    data.roomPass,
+    sentence,
+    data.time,
+    newPlayer,
+  );
+  roomManager.add(room);
+  if (roomManager.has(data.roomId)) {
+    sendJSON(connection, {
+      type: "SUCCESS",
+      code: "ROOM_CREATED",
+      sentence,
+    });
+  }
+  return newPlayer;
+}

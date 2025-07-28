@@ -1,4 +1,4 @@
-import Player from "./playerInit";
+import Player from "../player/playerInit";
 
 export function handlePingPong(player: Player, timestamp: number) {
   //  simple ping pong methd to calculate the ping;
