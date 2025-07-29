@@ -1,42 +1,94 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+html, body, #root {
+  background-color: rgb(0, 0, 0);
+  color: white;       /* Optional: text color for debugging */
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;   /* avoid scrollbars */
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+canvas {
+    height: 100vh !important ;
+    background-color: #0d0d0d;
+    padding: 0;
+    margin: 0;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+
+
+/* terminal */
+#term {
+  transform: translateZ(0.0001px); /* force GPU */
+  width: 255px;
+  min-height: 132px;
+   background: radial-gradient(ellipse at center, rgba(20,19,19,0.95) 0%, rgba(10,10,10,0.98) 100%);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+    align-items: center; 
+  justify-content: center;
+  transform: scale(0.35); 
+  background-color: #83ffa4;
+  box-shadow:  -6px 6px 6px #99959558;
+}
+
+.title{
+    border: 0.1px solid rgb(0, 255, 8);
+    color: #00ff41;
+    margin-bottom: 30px;
+    width: 150px;
+    user-select: none;
+}
+
+.bt {
+  align-content: center;
+    height: 14px;
+  width: 80px;
+  background-color: #002b11;
+  color: #00ff41;
+  cursor: pointer;
+  font-size: 10px;
+  border-bottom: 1 solid greenyellow;
+  font-family: 'Courier New', Courier, monospace;
+  text-transform: uppercase;
+  border-radius: 1px;
+  cursor: crosshair;
+  border-bottom: 2px;
+  user-select: none;
+}
+
+#term {
+  opacity: 0;
+  animation: fadeInTerminal 1.4s ease-in forwards;
+}
+
+@keyframes fadeInTerminal {
+  0% {
+       opacity: 0;
+    transform: scale(0.1) translateY(10px);
+    
   }
-  to {
-    transform: rotate(360deg);
+
+  80%{
+        opacity: 0.2;
+    transform: scale(0.15) translateY(10px);
+    color: white;
+  }
+
+  90% {
+    scale: 0.94;
+      opacity:0.5;
+  }
+  100%{
+    scale:0.94;
+    opacity:1;
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+.quote{
+    font-family: cursive;
+    font-size: x-small;
+    font-weight: lighter;
 }
