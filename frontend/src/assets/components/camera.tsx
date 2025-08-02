@@ -2,12 +2,10 @@ import { useThree, useFrame } from '@react-three/fiber';
 import { useRef, useEffect, useState, useMemo } from 'react';
 import * as THREE from 'three';
 import { memo } from 'react';
-import { WSconnect, WSdisconnect } from './socket';
 
 
 export const Camera = memo(function Camera({ terminal }: { terminal: () => void }) {
 
-WSconnect();
   const { camera } = useThree();
   const timeRef = useRef(0);         // For oscillation
   const zoomProgress = useRef(0);    // For zoom animation
@@ -33,7 +31,6 @@ WSconnect();
         setZooming(false);
         triggered.current = false;
         camera.position.set(0, 0, 0);
-        WSdisconnect();
       }
     };
 
@@ -67,7 +64,6 @@ WSconnect();
       triggered.current = true;
       terminal(); 
       //i am thinking to bind the web sockets on  zoom
-      WSconnect();
     }
     }
   });

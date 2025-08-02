@@ -17,8 +17,9 @@ export default function handleKeyPress(
 
   if (!room || typeof cursor != "number" || !playerId) {
     sendJSON(connection, {
-      type: "ERROR",
+      type: "FEEDBACK",
       code: "ROOM/CURSOR_NOT_FOUND",
+      msg:"the room or the cursor not found"
     });
     return;
   }
@@ -27,14 +28,16 @@ export default function handleKeyPress(
     case " ":
       {
         let opponent = roomManager.getOpponentId(room, playerId);
+        if (!opponent)return;
         let actualWord = roomManager.get_actualWord(wordIndex, room);
         typedWord = roomManager.get_typedWord(wordIndex, room, playerId);
         wordIndex += 1;
         let res = fuzzyCheck(actualWord, typedWord);
         if (res == 1) {
           sendJSON(connection, {
-            type: "SQUIGGLE",
+            type: "GAME_RES", 
             player: opponent,
+            code:"FUZZY",
             /*  to id bw the opp and player cursor <add fuzzy check to opponent's ghost cursor,
                             if the name is mine then squiggle the ghost cursor of the opponent */
             data: {
@@ -63,7 +66,8 @@ export default function handleKeyPress(
         player?.update_cursorPos(++cursor);
 
         sendJSON(connection, {
-          type: "FEEDBACK",
+          type: "GAME_RES",
+          code:"CHAR_CHECK",
           player: playerId,
           data: {
             index: cursor,

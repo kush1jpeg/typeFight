@@ -1,5 +1,6 @@
 import { distance } from "fastest-levenshtein";
 import { WebSocket } from "ws";
+import { messageTypes } from "../types";
 
 export function fuzzyCheck(actual: string, typed: string): number {
   const dis = distance(typed, actual);
@@ -11,7 +12,7 @@ export function fuzzyCheck(actual: string, typed: string): number {
   } //ignore as minor error for the ghost cursor
 }
 
-export function sendJSON(ws: WebSocket, obj: object) {
+export function sendJSON(ws: WebSocket, obj: messageTypes) {
   ws.send(JSON.stringify(obj));
 }
 

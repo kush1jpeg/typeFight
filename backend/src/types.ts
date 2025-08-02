@@ -5,8 +5,8 @@ export interface playerInterface {
   gamerId: string;
   socket: WebSocket;
   cursor: number;
-  typeSpeed?: number; //wpm logic
   typed: string | "";
+  ready: boolean  // <-- to track inorder to trigger the shite
   //rating?: number to be implemented when i make my elo based ranking algortihm :)
   state: {
     isAlive: string; //rage quit and disconnect-> will add 10sec counter to reconnect otherwise gg
@@ -22,13 +22,12 @@ export interface Room {
 }
 
 export type messageTypes =
-  | {
+   {
       type: "TOKEN_CREATE";
       roomId: string;
       roomPass: string;
       gamerId: string;
-      time: number;
-      typeOF_sen: string; //the type of sentences he wants to practice on
+      time:number;
     }
   | {
       type: "TOKEN_JOIN";
@@ -45,20 +44,37 @@ export type messageTypes =
   | {
       type: "TOKEN_PONG";
       timestamp: number;
-      uuid: string;
     }
   | {
       type: "FEEDBACK";
-      timestamp: number;
-      uuid: string;
-    }
-  | {
-      type: "ERROR";
-      timestamp: number;
-      uuid: string;
+      code: string;
+      msg: string;
     }
   | {
       type: "RESIGN";
       roomId: string;
       playerId: string;
-    };
+    }
+    |{
+        type: "GAME_RES",
+            code:string,
+            player:string,
+            data: {
+              index: number, //cursor
+              status: string,
+            }
+    }
+/* |
+
+{
+  type: 'ROUND_START';
+  startTime: number;
+}
+|{
+  type: 'CLIENT_READY';
+  roomId: string;
+}
+|{
+  type: 'ROUND_END';
+  winnerId: string;  
+} */

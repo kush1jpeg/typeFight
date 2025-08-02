@@ -6,7 +6,7 @@ import handleCreate from "../handlers/onCreate";
 import handleKeyPress from "../handlers/onKeyPress";
 import { startPingLoop } from "../handlers/onPong";
 import Player from "../player/playerInit";
-import { handleDelete } from "../handlers/onResign";
+import { handleDelete, roundCheck } from "../handlers/onResign";
 
 export const roomManager = new RoomManager();
 
@@ -48,5 +48,11 @@ export function handleTokens(uuid: string, data:messageTypes, connection: WebSoc
         }
       }
       break;
+      case "FEEDBACK":
+        {
+          if(data.code=='READY'){
+            roundCheck(data.msg);
+          }
+        }
   }
 }

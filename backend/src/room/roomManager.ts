@@ -15,7 +15,7 @@ export class RoomManager {
   }
 
   delete(roomId: string) {
-    // or map.delete and map builtin func lowkey i fogot about them and made this shit
+    // or map.delete and the map builtin func lowkey i fogot about them and made this shit
     this.rooms.delete(roomId);
   }
 
@@ -37,7 +37,6 @@ export class RoomManager {
       const player = room.players[playerId];
       player.cursor = 0;
       player.typed = "";
-      player.typeSpeed = 0;
       player.state.isAlive = "alive";
     }
   }

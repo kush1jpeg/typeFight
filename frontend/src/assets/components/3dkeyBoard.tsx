@@ -1,12 +1,18 @@
 import { Canvas } from '@react-three/fiber'
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, useEffect, useState, type CSSProperties } from 'react'
 import { Environment, Lightformer, useGLTF } from '@react-three/drei';
 import { useTexture } from '@react-three/drei';
 import { Text } from '@react-three/drei';
 import { TerminalUI } from './terminal';
 import { Camera } from './camera';
-import { useLoadingStore } from '../atoms';
+import { useLoadingStore } from '../zustand';
+import { DotLoader } from 'react-spinners';
 
+const override: CSSProperties= {
+  display: "block",
+    margin: "50vh auto",
+  width:'30px',
+};
 
 function Lamp() {
   const { scene } = useGLTF('/3d-model/lamp.glb');
@@ -50,8 +56,8 @@ function GameTitle() {
 
 function Chair() {
   const { scene } = useGLTF('/3d-model/chair.glb');
-  const loaded=useLoadingStore((s:any) => s.setLoaded);
-   useEffect(()=>{ loaded()}, [scene])   
+  const setloaded=useLoadingStore((s:any) => s.setLoaded);
+   useEffect(()=>{ setloaded()}, [scene])   
 return (<primitive object={scene} rotation={[0, (Math.PI * 2.7) / 2, 0]} position={[2, -2.4, 4.1]} scale={3} castShadow />)
 }
 
@@ -118,8 +124,19 @@ function Table() {
 }
 
 export default function ROOM() {
+  const loaded = useLoadingStore((s) => s.isLoaded);
+  console.log(loaded);
   const [showTerminal, setShowTerminal] = useState(false)
   return (
+<>
+     {!loaded && (
+        <DotLoader
+          cssOverride={override}
+          color="#f1d946"
+          size={40}
+        />
+      )}
+
     <Canvas style={{ background: 'black' }} shadows >
 
   <Camera terminal={() => {
@@ -164,5 +181,6 @@ export default function ROOM() {
         </Environment>
       </Suspense>
     </Canvas>
+    </>
   )
 }

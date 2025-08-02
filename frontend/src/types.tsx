@@ -21,9 +21,13 @@ export type messageTypes =
       playerId: string;
     }
   | {
-      type: "TOKEN_PING";
+      type: "TOKEN_PONG";
       timestamp: number;
     }
+ | {
+      type: "TOKEN_PING";
+      timestamp: number;
+ }    
   | {
       type: "FEEDBACK";
       code: string;

@@ -7,8 +7,8 @@ class Player implements playerInterface {
   protected uuid: string;
   public socket: WebSocket;
   public cursor: number;
-  public typeSpeed?: number | 0;
-  public typed: string | "";
+  public typed: string;
+  public ready: boolean ;
   public state: {
     isAlive: string;
     ping?: number | string;
@@ -20,16 +20,13 @@ class Player implements playerInterface {
     this.uuid = uuid;
     this.cursor = 0;
     this.typed = "";
-    this.typeSpeed;
+    this.ready=false;
     this.state = {
       isAlive: "idle",
       ping: "connecting",
     };
   }
 
-  update_speed(speed: number) {
-    this.typeSpeed = speed;
-  }
   set_typed(typed: string) {
     this.typed += typed;
   }

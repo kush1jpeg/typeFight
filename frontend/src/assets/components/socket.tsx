@@ -1,38 +1,40 @@
-import { handleIncoming } from "../handler";
-
+import { create } from "zustand";
 const URL = import.meta.env.VITE_SOCKET_URL ??"ws://localhost:7654";
-let ws: WebSocket|null = null;
+import type { messageTypes } from "../../types";
 
-export function WSconnect() {
-  ws = new WebSocket(URL);
-  ws.onopen = () => {
-    console.log("WebSocket rockss!");
-  }
+// to track the ws connection 
+type WS_state = {
+  ws:WebSocket|null;
+  connect:()=>void;
+  disconnect:()=>void;
+  send:(msg:messageTypes)=>void;
+}
 
+export const useSocketStore = create<WS_state>((set, get) => ({  
+   ws:null,
+  connect: () => {
+    const ws = new WebSocket(URL);
+    ws.onopen = () => console.log("--> Connected to wServer");
 
-  ws.onmessage = (event) => { //listen types
-    try {
-      const data = JSON.parse(event.data);
-      handleIncoming(data)
+    ws.onmessage = (e) => {
+      const msg = JSON.parse(e.data);
+      console.log("Incoming message -->", msg);
+    };
 
-    } catch (err) {
-      console.warn("Invalid WS message:", event.data);
+    ws.onerror = (e) => console.warn("X--> Socket error", e);
+
+    set({ ws });
+  },
+  disconnect: () => {
+    get().ws?.close(1000, "--> Manual disconnect");
+    set({ ws: null });
+  },
+  send: (msg:messageTypes) => {
+    const socket = get().ws;
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify(msg));
+    } else {
+      console.warn("Can't send, socket not open bruh.");
     }
-  }
-}
-export function WSdisconnect() {
-  if (ws && ws.readyState === WebSocket.OPEN) {   
-  ws.close(1000, "closing")
-      console.warn("closed webSocket connection:");
-  }
-  }
-
-
-
-//custom hook to practice
-export function sendWs(msg:object)  //send types
-//ws only takes strings
-{
-  if ( ws && ws.OPEN === ws.readyState && msg) ws.send(JSON.stringify(msg));
-  else console.log("Websocket not connected");
-}
+  },
+}));

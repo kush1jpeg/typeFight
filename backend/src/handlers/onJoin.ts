@@ -15,16 +15,23 @@ export default function handleJoin(
     const room = roomManager.get(data.roomId);
     if (room && Object.keys(room.players).length < 2) {
       room.players[newPlayer.gamerId] = newPlayer;
+      sendJSON(connection, {
+        type: "FEEDBACK",
+        code: "ROOM_JOIN",
+        msg:"Room joined successfully"
+      });
     } else {
       sendJSON(connection, {
-        type: "ERROR",
+        type: "FEEDBACK",
         code: "ROOM_FULL",
+        msg:"Room full"
       });
     }
   } else {
     sendJSON(connection, {
-      type: "ERROR",
-      code: "ROOM_NOT_FOUND",
+      type: "FEEDBACK",
+       code: "ROOM_NOT_FOUND",
+      msg:"Requested room was not found"
     });
   }
   return newPlayer;
