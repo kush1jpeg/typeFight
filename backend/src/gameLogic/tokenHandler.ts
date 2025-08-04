@@ -7,16 +7,20 @@ import handleKeyPress from "../handlers/onKeyPress";
 import { startPingLoop } from "../handlers/onPong";
 import Player from "../player/playerInit";
 import { handleDelete, roundCheck } from "../handlers/onResign";
+import { sendJSON } from "./helperFunc";
 
 export const roomManager = new RoomManager();
 
-export function handleTokens(uuid: string, data:messageTypes, connection: WebSocket) {
+export function handleTokens(
+  uuid: string,
+  data: messageTypes,
+  connection: WebSocket,
+) {
   let player: Player | null = null;
   switch (data.type) {
     case "TOKEN_JOIN":
       {
         player = handleJoin(connection, uuid, data, roomManager);
-        
       }
       break;
 
@@ -48,11 +52,23 @@ export function handleTokens(uuid: string, data:messageTypes, connection: WebSoc
         }
       }
       break;
-      case "FEEDBACK":
-        {
-          if(data.code=='READY'){
-            roundCheck(data.msg);
-          }
+    case "FEEDBACK": {
+      if (data.code == "READY") {
+        console.log("received ready by the backend");
+        player = roomManager.getPlayerByUUID(data.msg, uuid);
+        if (player) roundCheck(data.msg, player);
+      }
+
+      if (data.code == "NO_RESPONSE") {
+        const roomId = data.msg;
+        if (handleDelete(roomId)) {
+          sendJSON(connection, {
+            type: "FEEDBACK",
+            code: "ROOM_DELETED",
+            msg: "The room was deleted due to inactivity",
+          });
         }
+      }
+    }
   }
 }

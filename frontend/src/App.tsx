@@ -4,9 +4,20 @@ import { Bounce, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Checker from './assets/components/checker';
+import { useEffect } from 'react';
+import { useSocketStore } from './assets/components/socket';
 
 
 function App() {
+  const connect = useSocketStore(s => s.connect);
+  const disconnect = useSocketStore(s => s.disconnect);
+
+  useEffect(() => {
+    connect() // i wanted on terminal mount but then i cant switch to another route as it gets reset 
+    return () => {
+      disconnect(); // clean up on unmount
+    };
+  }, []);
 
   return (
     <>

@@ -8,10 +8,10 @@ import { Camera } from './camera';
 import { useLoadingStore } from '../zustand';
 import { DotLoader } from 'react-spinners';
 
-const override: CSSProperties= {
+const override: CSSProperties = {
   display: "block",
-    margin: "50vh auto",
-  width:'30px',
+  margin: "50vh auto",
+  width: '30px',
 };
 
 function Lamp() {
@@ -56,9 +56,9 @@ function GameTitle() {
 
 function Chair() {
   const { scene } = useGLTF('/3d-model/chair.glb');
-  const setloaded=useLoadingStore((s:any) => s.setLoaded);
-   useEffect(()=>{ setloaded()}, [scene])   
-return (<primitive object={scene} rotation={[0, (Math.PI * 2.7) / 2, 0]} position={[2, -2.4, 4.1]} scale={3} castShadow />)
+  const setloaded = useLoadingStore((s: any) => s.setLoaded);
+  useEffect(() => { setloaded() }, [scene])
+  return (<primitive object={scene} rotation={[0, (Math.PI * 2.7) / 2, 0]} position={[2, -2.4, 4.1]} scale={3} castShadow />)
 }
 
 function Logo() {
@@ -128,8 +128,8 @@ export default function ROOM() {
   console.log(loaded);
   const [showTerminal, setShowTerminal] = useState(false)
   return (
-<>
-     {!loaded && (
+    <>
+      {!loaded && (
         <DotLoader
           cssOverride={override}
           color="#f1d946"
@@ -137,50 +137,52 @@ export default function ROOM() {
         />
       )}
 
-    <Canvas style={{ background: 'black' }} shadows >
+      <Canvas style={{ background: 'black' }} shadows >
 
-  <Camera terminal={() => {
-  setShowTerminal(prev => !prev);
-  console.log("terminal clicked");
-}} />
+        <Camera terminal={() => {
+          setShowTerminal(prev => !prev);
+          console.log("terminal clicked");
+        }} />
 
-      <ambientLight intensity={0.3} />
-      <directionalLight
-        position={[5, 10, 5]}
-        intensity={1}
-        castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-        shadow-camera-far={50}
-        shadow-camera-left={-10}
-        shadow-camera-right={10}
-        shadow-camera-top={10}
-        shadow-camera-bottom={-10} />
+        <ambientLight intensity={0.3} />
+        <directionalLight
+          position={[5, 10, 5]}
+          intensity={1}
+          castShadow
+          shadow-mapSize-width={1024}
+          shadow-mapSize-height={1024}
+          shadow-camera-far={50}
+          shadow-camera-left={-10}
+          shadow-camera-right={10}
+          shadow-camera-top={10}
+          shadow-camera-bottom={-10} />
 
-      <Suspense fallback={null}>
+        <Suspense fallback={null}>
 
-        <Monitor />
-        <GameTitle />
-        <Table />
-        <Chair />
-        <Logo />
-        <Lamp />
+          <Monitor />
+          <GameTitle />
+          <Table />
+          <Chair />
+          <Logo />
+          <pointLight position={[-7, 3, -4]} intensity={8} color={"#fff"} />
+          <ambientLight intensity={0.1} />
+          <Lamp />
 
-        {showTerminal && (
-          <TerminalUI />
-        )}
-        <Environment preset="park">
-          <Lightformer
-            form="rect"
-            intensity={2}
-            color="white"
-            position={[5, 5, 5]}
-            scale={[5, 5, 1]}
-            target={[0, 0, 0]}
-          />
-        </Environment>
-      </Suspense>
-    </Canvas>
+          {showTerminal && (
+            <TerminalUI />
+          )}
+          <Environment preset="park">
+            <Lightformer
+              form="rect"
+              intensity={2}
+              color="white"
+              position={[5, 5, 5]}
+              scale={[5, 5, 1]}
+              target={[0, 0, 0]}
+            />
+          </Environment>
+        </Suspense>
+      </Canvas>
     </>
   )
 }

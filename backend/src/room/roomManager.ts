@@ -53,4 +53,11 @@ export class RoomManager {
     const words = room.players[gamerId].typed.split(" ");
     return words[wordIndex] || "";
   }
+
+  getPlayerByUUID(roomId: string, uuid: string): Player | null {
+    // should have stored by uuid only
+    const room = this.get(roomId);
+    if (!room) return null;
+    return Object.values(room.players).find((p) => p.uuid === uuid) || null;
+  }
 }

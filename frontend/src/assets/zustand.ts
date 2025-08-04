@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 // to store the current player info in a atom
 
@@ -29,40 +29,46 @@ const defaultPlayer: playerInterface = {
 
 // to track the room state
 type RoomState = {
-  token:'TOKEN_CREATE' | 'TOKEN_JOIN' | null;
+  sentence: string;
+  token: "TOKEN_CREATE" | "TOKEN_JOIN" | null;
   roomId: string;
   password: string;
-  gamerId:string;
-  joined:boolean;
-  time:number|null ;
-  start:boolean;
+  gamerId: string;
+  joined: boolean;
+  time: number | null;
+  start: boolean;
+  mode: string;
   setRoomId: (id: string) => void;
   setPassword: (pw: string) => void;
-  setgamerId:(pw:string)=>void;
-  set_token:(pw:'TOKEN_CREATE' | 'TOKEN_JOIN')=>void;                 // to track the type of token to be sent
-  setJoined: (pId:boolean) => void;          // if the player joined or not
-  settime: (time:number|null) => void;             // room time
-  setStart: (p:boolean) => void;             // to start the 3sec timer together for every device
+  setgamerId: (pw: string) => void;
+  set_token: (pw: "TOKEN_CREATE" | "TOKEN_JOIN") => void; // to track the type of token to be sent
+  setJoined: (pId: boolean) => void; // if the player joined or not
+  settime: (time: number | null) => void; // room time
+  setStart: (p: boolean) => void; // to start the 3sec timer together for every device
+  setMode: (p: string) => void; // to track the mode of the user.
+  setSentence: (sent: string) => void; // to store the sentence
 };
 
 export const useRoomStore = create<RoomState>((set) => ({
-  token:null, 
-  roomId:'',
-  start:false,
-  time:null,
-  password:'',
-  gamerId:'', 
-  joined:false, 
-  setStart:(p:boolean)=>set({start:p}),
-  setJoined: (pId:boolean) => set({ joined: pId }),
-  setRoomId: (id:string) => set({ roomId: id }),
-  setPassword: (pw:string) => set({ password: pw }),
-  setgamerId: (pId:string) => set({ gamerId: pId }),
-  set_token:(m:'TOKEN_CREATE'|'TOKEN_JOIN')=>set({token:m}),
-  settime:(m:number|null)=>set({time:m})
+  sentence: "",
+  mode: "select",
+  token: null,
+  roomId: "",
+  start: false,
+  time: null,
+  password: "",
+  gamerId: "",
+  joined: false,
+  setStart: (p: boolean) => set({ start: p }),
+  setJoined: (pId: boolean) => set({ joined: pId }),
+  setRoomId: (id: string) => set({ roomId: id }),
+  setPassword: (pw: string) => set({ password: pw }),
+  setgamerId: (pId: string) => set({ gamerId: pId }),
+  set_token: (m: "TOKEN_CREATE" | "TOKEN_JOIN") => set({ token: m }),
+  settime: (m: number | null) => set({ time: m }),
+  setMode: (m: string) => set({ mode: m }),
+  setSentence: (sent) => set({ sentence: sent }),
 }));
-
-
 
 // to track weather the 3d env has been loaded or not
 type LoadingStore = {
@@ -73,4 +79,3 @@ export const useLoadingStore = create<LoadingStore>((set) => ({
   isLoaded: false,
   setLoaded: () => set({ isLoaded: true }),
 }));
-

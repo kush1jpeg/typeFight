@@ -22,6 +22,7 @@ wsServer.on("connection", (connection: WebSocket, request: IncomingMessage) => {
   connection.on("message", (msg) => {
     try {
       const data = JSON.parse(msg.toString());
+      console.log("received by backend", data);
       handleTokens(uuid, data, connection);
     } catch (err) {
       console.error("Invalid message", err);

@@ -1,6 +1,6 @@
 import { sendJSON } from "../gameLogic/helperFunc";
 import { roomManager } from "../gameLogic/tokenHandler";
-import { wsServer } from "../server/websocket";
+import Player from "../player/playerInit";
 
 export function handleDelete(roomId: string): boolean {
   //if the user deletes
@@ -13,17 +13,28 @@ export function handleRestart(roomId: string) {
   roomManager.restart(roomId);
 }
 
-export function roundCheck(roomId:string){
+export function roundCheck(roomId: string, player: Player) {
   const room = roomManager.get(roomId);
-  if(!room?.players){return console.log("no player present");}
-  const allReady = Object.values(room?.players).every(p => p.ready);      // insane cracked way told by gpt!  
-  if(allReady){
- for (const player of Object.values(room.players)) {
-sendJSON(player.socket,{
-   type: "FEEDBACK" ,
-   code: "ROUND_START", 
-   msg:String(Date.now())
-  })
-   }
+  console.log("triggered");
+  if (!room?.players) {
+    return console.log("no player present");
+  }
+  player.set_ready(true);
+  const allReady = Object.values(room?.players).every((p) => p.ready); // insane cracked way told by gpt!
+  console.log("[🧠 roundCheck]", {
+    playerReady: player.ready,
+    allPlayers: Object.values(room.players).map((p) => ({
+      id: p.gamerId,
+      ready: p.ready,
+    })),
+  });
+  if (allReady) {
+    for (const p of Object.values(room.players)) {
+      sendJSON(p.socket, {
+        type: "FEEDBACK",
+        code: "ROUND_START",
+        msg: String(Date.now()),
+      });
+    }
   }
 }
