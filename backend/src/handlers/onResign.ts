@@ -33,8 +33,12 @@ export function roundCheck(roomId: string, player: Player) {
       sendJSON(p.socket, {
         type: "FEEDBACK",
         code: "ROUND_START",
-        msg: String(Date.now()),
+        msg: "The round is starting",
       });
     }
+    const currentTime = Date.now();
+    roundTimeCHECK(currentTime);
   }
 }
+
+function roundTimeCHECK(time: number) {}

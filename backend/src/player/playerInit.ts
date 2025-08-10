@@ -9,6 +9,7 @@ class Player implements playerInterface {
   public cursor: number;
   public typed: string;
   public ready: boolean;
+  public words: string[] = [];
   public state: {
     isAlive: string;
     ping?: number | string;

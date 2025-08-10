@@ -18,6 +18,9 @@ export default function Checker() {
     }
   }, [valid]);
 
-  return valid ? <TypeFight /> : <Navigate to="/" replace />;
+  return valid ? <>
+    <div className='bg-oniViolet'><TypeFight /> </div>
+  </>
+    : <Navigate to="/" replace />;
 }
 

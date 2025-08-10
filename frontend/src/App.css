@@ -1,7 +1,7 @@
 html,
 body,
 #root {
-  background-color: rgb(0, 0, 0);
+  background-color: #110a1b;
   color: white; /* Optional: text color for debugging */
   height: 100%;
   margin: 0;
@@ -43,6 +43,7 @@ canvas {
   color: #00ff41;
   margin-bottom: 30px;
   width: 150px;
+  padding-left: 10px;
   user-select: none;
 }
 
@@ -61,6 +62,17 @@ canvas {
   cursor: crosshair;
   border-bottom: 2px;
   user-select: none;
+}
+
+.but {
+  transition: all 0.2s ease-in-out;
+  border-radius: 20px;
+}
+
+.but:hover {
+  background-color: #3b82f6; /* Tailwind blue-500 */
+  transform: scale(0.9);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 #term {
@@ -91,6 +103,7 @@ canvas {
 }
 
 .quote {
+  padding-left: 1.5rem;
   font-family:
     system-ui,
     -apple-system,
@@ -104,7 +117,9 @@ canvas {
     "Helvetica Neue",
     sans-serif;
   font-size: x-small;
-  font-weight: 300;
+  font-weight: 400;
+  color: #00ff00;
+  font-style: italic;
 }
 
 /* for the initiate button */
@@ -162,4 +177,65 @@ canvas {
   100% {
     top: 100%;
   }
+}
+
+/*  for the clock component */
+@keyframes pulse-scale {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse-scale {
+  animation: pulse-scale 1s infinite;
+}
+
+{/* for the cursor */}
+.cursor {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  animation: blink 1s steps(1) infinite;
+  pointer-events: none; /* so it doesn’t interfere with input */
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* for the ghost cursor  */
+
+@keyframes squiggle {
+  0% {
+    transform: rotate(0deg);
+    filter: hue-rotate(0deg);
+  }
+  25% {
+    transform: rotate(-5deg);
+    filter: hue-rotate(45deg);
+  }
+  50% {
+    transform: rotate(5deg);
+    filter: hue-rotate(-45deg);
+  }
+  75% {
+    transform: rotate(-3deg);
+  }
+  100% {
+    transform: rotate(0deg);
+    filter: hue-rotate(0deg);
+  }
+}
+
+.squiggle-once {
+  animation: squiggle 0.4s ease-in-out;
 }

@@ -55,7 +55,7 @@ export function TerminalUI() {
           roomId,
           roomPass,
           gamerId,
-          time: time ?? 30 // default value or handle null
+          time: time ?? 45 // default value or handle null
         };
         sendWs(payload);
       } else if (token === "TOKEN_JOIN") {
@@ -151,7 +151,7 @@ export function TerminalUI() {
         {mode === 'load' && (
           <>
             <br />
-            <p className='title p-0.5'>Waiting for opponent...</p>
+            <p className='title p-0.5'>Waiting for opponent..</p>
             {/* wait and set wait for the fucking ws connection !*/}
             <	SpinnerRoundFilled /><br />
             <button className='bt' onClick={() => setMode('select')}>Cancel</button>

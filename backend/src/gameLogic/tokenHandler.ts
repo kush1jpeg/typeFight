@@ -11,7 +11,7 @@ import { sendJSON } from "./helperFunc";
 
 export const roomManager = new RoomManager();
 
-export function handleTokens(
+export async function handleTokens(
   uuid: string,
   data: messageTypes,
   connection: WebSocket,
@@ -20,17 +20,17 @@ export function handleTokens(
   switch (data.type) {
     case "TOKEN_JOIN":
       {
-        player = handleJoin(connection, uuid, data, roomManager);
+        player = await handleJoin(connection, uuid, data, roomManager);
       }
       break;
 
     case "TOKEN_CREATE":
       {
-        player = handleCreate(connection, uuid, data, roomManager);
+        player = await handleCreate(connection, uuid, data, roomManager);
       }
       break;
 
-    case "KEY_PRESS":
+    case "WORD_TYPED":
       {
         handleKeyPress(connection, data, roomManager);
       }
@@ -38,14 +38,16 @@ export function handleTokens(
 
     case "RESIGN":
       {
+        const player = data.playerId;
         if (player) {
-          handleDelete(player);
+          handleDelete(data.roomId);
         }
       }
       break;
 
     case "TOKEN_PONG":
       {
+        const player = roomManager.getPlayerByUUID(uuid);
         if (player) {
           const timestamp = Date.now();
           startPingLoop(player, timestamp);
@@ -55,18 +57,21 @@ export function handleTokens(
     case "FEEDBACK": {
       if (data.code == "READY") {
         console.log("received ready by the backend");
-        player = roomManager.getPlayerByUUID(data.msg, uuid);
+        const player = roomManager.getPlayerByUUID(uuid);
         if (player) roundCheck(data.msg, player);
       }
 
       if (data.code == "NO_RESPONSE") {
         const roomId = data.msg;
-        if (handleDelete(roomId)) {
-          sendJSON(connection, {
-            type: "FEEDBACK",
-            code: "ROOM_DELETED",
-            msg: "The room was deleted due to inactivity",
-          });
+        const room = roomManager.get(roomId);
+        if (handleDelete(roomId) && room) {
+          for (const p of Object.values(room.players)) {
+            sendJSON(p.socket, {
+              type: "FEEDBACK",
+              code: "ROOM_DELETED",
+              msg: "The room was deleted due to inactivity",
+            });
+          }
         }
       }
     }

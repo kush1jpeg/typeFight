@@ -1,4 +1,6 @@
+import { roomManager } from "../gameLogic/tokenHandler";
 import type Player from "../player/playerInit";
+import { connections } from "../server/websocket";
 import { Room } from "../types";
 
 //room manager is added for easier control and clarity otherwise i could have dont manually too
@@ -54,10 +56,11 @@ export class RoomManager {
     return words[wordIndex] || "";
   }
 
-  getPlayerByUUID(roomId: string, uuid: string): Player | null {
-    // should have stored by uuid only
-    const room = this.get(roomId);
-    if (!room) return null;
-    return Object.values(room.players).find((p) => p.uuid === uuid) || null;
+  getPlayerByUUID(uuid: string): Player | undefined {
+    for (const room of this.rooms.values()) {
+      const player = Object.values(room.players).find((p) => p.uuid === uuid);
+      if (player) return player;
+    }
+    return undefined;
   }
 }

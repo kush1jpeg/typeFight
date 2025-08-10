@@ -15,12 +15,6 @@ export type messageTypes =
     gamerId?: string;
   }
   | {
-    type: "KEY_PRESS";
-    roomId: string;
-    char: string;
-    playerId: string;
-  }
-  | {
     type: "TOKEN_PONG";
     timestamp: number;
   }
@@ -34,12 +28,36 @@ export type messageTypes =
     msg: string;
   }
   | {
-    type: "ERROR";
-    timestamp: number;
-    uuid: string;
-  }
-  | {
     type: "RESIGN";
     roomId: string;
     playerId: string;
-  };
+  }
+  | {
+    type: "MESSAGE";
+    roomId: string;
+    msg: string;
+  }
+  | {
+    type: "ROOM_INFO";
+    sentence: string;
+    player1: string;
+    player2: string;
+  }
+  | {
+
+    type: "WORD_TYPED";
+    code: string;
+    roomId: string;
+    word: string;
+    playerId: string;
+  }
+  | {
+    type: "GAME_RES";
+    code: string;
+    player: string;
+    data: {
+      index: number; //cursor
+      status: boolean;
+    };
+  }
+

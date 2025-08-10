@@ -5,6 +5,12 @@ import { useSocketStore } from '../components/socket';
 import { Fight_arena } from './arena';
 import { ConfirmButton } from '../components/ holdButton';
 import { set_toast } from '../components/toast';
+import { HashLoader } from 'react-spinners';
+import myImage from '../stock/25373881.png';
+import Emoji_Dial from '../components/ openEmoji';
+import PlayerBox from '../components/playerBox.tsx';
+import RetroClock from '../components/clock.tsx';
+
 
 export function TypeFight() {
   const [count, setCount] = useState(5);  //timer
@@ -13,6 +19,9 @@ export function TypeFight() {
   const [but, setBut] = useState(true);
   const toastTimeout = useRef<number | null>(null);
   const wsTimeout = useRef<number | null>(null);
+  const time = useRoomStore.getState().time;
+  const player = useRoomStore.getState().gamerId
+  const opponent = useRoomStore.getState().opponent
 
   const sendWs = useSocketStore.getState().send;
   const Onsubmit = () => {
@@ -38,7 +47,8 @@ export function TypeFight() {
         code: 'NO_RESPONSE',
         msg: roomId
       })
-    }, 5000);
+
+    }, 13000);
 
     return () => {
       if (toastTimeout.current) clearTimeout(toastTimeout.current);
@@ -59,21 +69,98 @@ export function TypeFight() {
 
   return (
     <>
-      {but && (<ConfirmButton onSubmit={Onsubmit} />)}
+      {/* Computer frame wrapper */}
+      <div className="fixed inset-0 z-40 pointer-events-none flex items-center justify-center bg-[#110a1b]">
 
+        {/* Frame image */}
+        <img
+          src={myImage}
+          alt="retro themed computer frame"
+          className="
+      w-[1920px] h-[1420px] max-w-full
+      invert grayscale
+      transition-transform duration-300
+      scale-75
+      sm:scale-90
+      md:scale-100
+      lg:scale-[1.1]
+      xl:scale-[1.2]
+      origin-top
+      translate-y-[45px]
+      pointer-events-none
+    "
+        />
+
+        {/* Scaled UI layer */}
+        <div
+          className="
+      absolute top-0 left-1/2
+      w-[1920px] h-[1080px]
+      max-w-full
+      pointer-events-none
+      transition-transform duration-300
+      scale-75
+      sm:scale-90
+      md:scale-100
+      lg:scale-[1.1]
+      xl:scale-[1.3]
+      origin-top
+      -translate-x-1/2
+      translate-y-[45px]
+    "
+        >
+          {/* UI positioned relative to frame */}
+          <div>
+            {/* Emoji Dial */}
+            {start && <Emoji_Dial />}
+          </div>
+        </div>
+      </div>
+
+      {/* Confirm button wrapper */}
+      {but && (
+        <div className="pointer-events-auto fixed bottom-5 right-5 z-50">
+          <ConfirmButton onSubmit={Onsubmit} />
+        </div>)}
+
+      {/* Waiting screen */}
+      {!start && !but && (
+        <div className="flex items-center justify-center h-screen w-screen px-4">
+          <div className="flex flex-col items-center space-y-5 sm:space-y-7 z-50">
+            <HashLoader color="#66a30f" size={50} />
+            <p className="text-green-300 font-mono text-lg sm:text-xl md:text-2xl uppercase tracking-widest text-center">
+              waiting for opponent....
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Game countdown */}
       {start && (
         <div className="count">
           {count > 0 ? (
-            <div className=''>
+            <div className="flex items-center justify-center h-screen w-screen z-30">
               <ASCIIText
                 text={String(count)}
                 enableWaves={true}
-                asciiFontSize={8}
+                asciiFontSize={6} // slightly smaller for mobile
               />
             </div>
           ) : (
-            <Fight_arena />
-
+            <>
+              <div className='flex w-full mt-15 z-40'>
+                <div className='flex-[2] flex justify-center'>
+                  <PlayerBox name={player} ping={0} type='player' />
+                </div>
+                <div className='flex-[1] flex justify-center'>
+                  <RetroClock initialTime={time ? time : 45} onComplete={() => console.log("Time's up!")} />
+                </div>
+                <div className='flex-[2] flex justify-center'>
+                  <PlayerBox name={opponent} ping={0} type='opp' />
+                </div>
+              </div>
+              <Fight_arena />
+            </>
           )}
         </div>
       )}

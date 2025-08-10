@@ -1,3 +1,14 @@
 @import "tailwindcss";
 
-
+@theme {
+  --color-sumiInk: #16161d;
+  --color-waveBlue: #223249;
+  --color-sakuraPink: #ffc0cb;
+  --color-winterGreen: #76946a;
+  --color-oniViolet: #12091b;
+  --color-oldWhite: #dcd7ba;
+  --color-autumnRed: #823030;
+  --color-crystalBlue: #7fb4ca;
+  --color-waveRed: #e46876;
+  --color-springViolet: #110a1b;
+}

@@ -1,80 +1,84 @@
 import { WebSocket } from "ws";
 import { RoomManager } from "../room/roomManager";
-import { checkChar, fuzzyCheck, sendJSON } from "../gameLogic/helperFunc";
+import { fuzzyCheck, sendJSON } from "../gameLogic/helperFunc";
 import { messageTypes } from "../types";
 
 export default function handleKeyPress(
   connection: WebSocket,
-  data:Extract <messageTypes, { type: "KEY_PRESS" }> ,
+  data: Extract<messageTypes, { type: "WORD_TYPED" }>,
   roomManager: RoomManager,
 ) {
-  let player = roomManager.get(data.roomId)?.players[data.playerId];
-  let room = roomManager.get(data.roomId);
-  let playerId = player?.gamerId;
-  let cursor = player?.cursor;
-  let typedWord = "";
-  let wordIndex = 0;
+  const room = roomManager.get(data.roomId);
+  const player = room?.players[data.playerId];
 
-  if (!room || typeof cursor != "number" || !playerId) {
+  if (!room || !player) {
     sendJSON(connection, {
       type: "FEEDBACK",
-      code: "ROOM/CURSOR_NOT_FOUND",
-      msg:"the room or the cursor not found"
+      code: "ROOM/PLAYER_NOT_FOUND",
+      msg: "Room or player not found",
+    });
+    return;
+  }
+  const opponent = Object.values(room.players).find(
+    (pre) => pre.gamerId !== playerId,
+  );
+
+  const sentence = room.sentence;
+  if (!sentence || typeof player.cursor !== "number" || !opponent) {
+    sendJSON(connection, {
+      type: "FEEDBACK",
+      code: "DATA_NOT_FOUND",
+      msg: "Cursor or sentence or opponent not found",
     });
     return;
   }
 
-  switch (data.char) {
-    case " ":
-      {
-        let opponent = roomManager.getOpponentId(room, playerId);
-        if (!opponent)return;
-        let actualWord = roomManager.get_actualWord(wordIndex, room);
-        typedWord = roomManager.get_typedWord(wordIndex, room, playerId);
-        wordIndex += 1;
-        let res = fuzzyCheck(actualWord, typedWord);
-        if (res == 1) {
-          sendJSON(connection, {
-            type: "GAME_RES", 
-            player: opponent,
-            code:"FUZZY",
-            /*  to id bw the opp and player cursor <add fuzzy check to opponent's ghost cursor,
-                            if the name is mine then squiggle the ghost cursor of the opponent */
+  const cursor = player.cursor;
+  const playerId = player.gamerId;
+
+  switch (data.code) {
+    case "WORD_BOUNDARY": {
+      // This means: player hit space, enter, or moved cursor — commit word
+      player.typed += data.word;
+
+      // Checking for squiggle
+      const split: Array<string> = sentence.split(" ");
+      console.log(
+        "typedWord - ",
+        data.word.trim(),
+        "actualWord - ",
+        split[cursor],
+      );
+      const dist = fuzzyCheck(split[cursor], data.word.trim());
+      if (dist > Math.floor(data.word.length * 0.3)) {
+        // sending to opponent inorder to squiggle mine cursor on mistakes
+        if (opponent) {
+          sendJSON(opponent.socket, {
+            type: "GAME_RES",
+            code: "SQUIGGLE",
+            player: playerId,
             data: {
               index: cursor,
-              status: "FUZZY so squiggle",
+              status: true,
             },
           });
         }
-        typedWord = "";
-        actualWord = "";
-      }
-      break;
-
-    case "BACK_SPACE":
-      {
-        player?.set_backSpace();
-      }
-      break;
-
-    //                 handle for the RESIGN final using esc in the frontend!
-
-    default:
-      {
-        let res = checkChar(data.char, room.sentence[cursor]);
-        player?.set_typed(data.char);
-        player?.update_cursorPos(++cursor);
-
-        sendJSON(connection, {
+      } else {
+        sendJSON(opponent.socket, {
           type: "GAME_RES",
-          code:"CHAR_CHECK",
+          code: "UPDATE",
           player: playerId,
           data: {
             index: cursor,
-            status: res == 1 ? "right_char" : "wrong char",
+            status: false,
           },
         });
       }
+
+      // Save word and move cursor
+      player.words[cursor] = data.word;
+      player.update_cursorPos(cursor + 1);
       break;
+    }
   }
 }

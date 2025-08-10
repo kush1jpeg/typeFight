@@ -1,6 +1,8 @@
+// from - https://www.dzialowski.eu/hold-to-confirm-button/
+
 import React from "react"
 
-const HOLD_DELAY = 1500 // 2 seconds of holding needed to trigger action
+const HOLD_DELAY = 1500 // 1.5 seconds of holding needed to trigger action
 
 type Confirm_type = {
   onSubmit: () => void;
@@ -34,12 +36,14 @@ export const ConfirmButton = ({ onSubmit }: Confirm_type) => {
   }
 
   return (
-    <button className="nasa-btn mt-[50vh] ml-[40vw]"
-      onMouseDown={startCounter} // When user clicks the button we start the counter
-      onMouseUp={stopCounter} // When user lift the button we stop the counter
-    >
-      ░▒▓█ Hold to Initialize █▓▒░
-    </button>
+    <div className="flex items-center justify-center h-screen w-screen z-50">
+      <button className="nasa-btn absolute "
+        onMouseDown={startCounter} // When user clicks the button we start the counter
+        onMouseUp={stopCounter} // When user lift the button we stop the counter
+      >
+        ░▒▓█ Hold to Initialize █▓▒░
+      </button>
+    </div>
   )
 }
 

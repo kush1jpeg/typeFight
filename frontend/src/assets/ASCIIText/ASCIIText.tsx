@@ -241,7 +241,7 @@ class CanvasTxt {
     {
       fontSize = 200,
       fontFamily = "Arial",
-      color = "#fdf9f3",
+      color = "#16161d",
     }: CanvasTxtOptions = {},
   ) {
     this.canvas = document.createElement("canvas");
@@ -405,7 +405,7 @@ class CanvAscii {
   setRenderer() {
     this.renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
     this.renderer.setPixelRatio(1);
-    this.renderer.setClearColor(0x000000, 0);
+    this.renderer.setClearColor(0x110a1b, 0.4);
 
     this.filter = new AsciiFilter(this.renderer, {
       fontFamily: "IBM Plex Mono",
@@ -617,7 +617,7 @@ export default function ASCIIText({
   return (
     <div
       ref={containerRef}
-      className="ascii-text-container"
+      className="ascii-text-container z-30"
       style={{
         position: "absolute",
         width: "100%",
