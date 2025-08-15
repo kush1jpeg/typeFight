@@ -14,13 +14,15 @@ const actions = [
 ];
 
 export default function Emoji_Dial() {
-  const sendWs = useSocketStore(s => s.send)
-  const roomId = useRoomStore.getState().roomId
+  const sendWs = useSocketStore(s => s.send);
+  const roomId = useRoomStore.getState().roomId;
+  const playerId = useRoomStore.getState().gamerId;
 
   function handleEmojiClick(prop: string) {
     sendWs({
       type: "MESSAGE",
       roomId,
+      playerId,
       msg: prop,
     })
   }

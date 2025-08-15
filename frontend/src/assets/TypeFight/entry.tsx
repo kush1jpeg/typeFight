@@ -10,6 +10,7 @@ import myImage from '../stock/25373881.png';
 import Emoji_Dial from '../components/ openEmoji';
 import PlayerBox from '../components/playerBox.tsx';
 import RetroClock from '../components/clock.tsx';
+import TauntDisplay from '../components/ taunt.tsx';
 
 
 export function TypeFight() {
@@ -22,8 +23,18 @@ export function TypeFight() {
   const time = useRoomStore.getState().time;
   const player = useRoomStore.getState().gamerId
   const opponent = useRoomStore.getState().opponent
-
   const sendWs = useSocketStore.getState().send;
+
+  const player_Ping = useRoomStore(s => s.player_ping);
+  const opp_Ping = useRoomStore(s => s.opp_ping);
+
+
+  const restart = () => {
+    setCount(5);
+    setBut(true);
+    useRoomStore.getState().reset();
+  }
+
   const Onsubmit = () => {
     if (toastTimeout.current) clearTimeout(toastTimeout.current);
     if (wsTimeout.current) clearTimeout(wsTimeout.current);
@@ -58,6 +69,7 @@ export function TypeFight() {
   }, []);
 
 
+
   useEffect(() => {
     if (!start || count <= 0) return;
     const timer = setTimeout(() => {
@@ -70,8 +82,7 @@ export function TypeFight() {
   return (
     <>
       {/* Computer frame wrapper */}
-      <div className="fixed inset-0 z-40 pointer-events-none flex items-center justify-center bg-[#110a1b]">
-
+      <div className="fixed inset-0 z-20 pointer-events-none flex items-center justify-center bg-[#110a1b]">
         {/* Frame image */}
         <img
           src={myImage}
@@ -88,6 +99,7 @@ export function TypeFight() {
       origin-top
       translate-y-[45px]
       pointer-events-none
+          z-50
     "
         />
 
@@ -112,7 +124,10 @@ export function TypeFight() {
           {/* UI positioned relative to frame */}
           <div>
             {/* Emoji Dial */}
-            {start && <Emoji_Dial />}
+            {start && (<>
+              <Emoji_Dial />
+              <TauntDisplay />
+            </>)}
           </div>
         </div>
       </div>
@@ -138,7 +153,7 @@ export function TypeFight() {
       {/* Game countdown */}
       {start && (
         <div className="count">
-          {count > 0 ? (
+          {count > 0 ? (<>
             <div className="flex items-center justify-center h-screen w-screen z-30">
               <ASCIIText
                 text={String(count)}
@@ -146,20 +161,20 @@ export function TypeFight() {
                 asciiFontSize={6} // slightly smaller for mobile
               />
             </div>
-          ) : (
+          </>) : (
             <>
               <div className='flex w-full mt-15 z-40'>
                 <div className='flex-[2] flex justify-center'>
-                  <PlayerBox name={player} ping={0} type='player' />
+                  <PlayerBox name={player} ping={player_Ping} type='player' />
                 </div>
                 <div className='flex-[1] flex justify-center'>
-                  <RetroClock initialTime={time ? time : 45} onComplete={() => console.log("Time's up!")} />
+                  <RetroClock Time={time} />
                 </div>
                 <div className='flex-[2] flex justify-center'>
-                  <PlayerBox name={opponent} ping={0} type='opp' />
+                  <PlayerBox name={opponent} ping={opp_Ping} type='opp' />
                 </div>
               </div>
-              <Fight_arena />
+              <Fight_arena onRestart={restart} />
             </>
           )}
         </div>

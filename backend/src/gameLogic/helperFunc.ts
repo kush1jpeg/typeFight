@@ -43,7 +43,7 @@ export async function getGroqChatCompletion(time: string) {
     messages: [
       {
         role: "user",
-        content: `Generate a text piece for a typing test as fast as you can. It must be composed exclusively of words and phrasing used by ${randomAuthor} in their original works and should contain no punctuation marks. The text should be long enough if the player types at 70wpm for ${time} seconds. Keep it meaningful and consistent with the author and dont write anything except than the text piece.`,
+        content: `Generate a text piece for a typing test of ${time} seconds as fast as you can prioritize speed over accuracy. It must be composed exclusively of words and phrasing used by ${randomAuthor} in their original works and should contain no punctuation marks. The text should be long enough if the player types at 70wpm for ${time} seconds. Keep it meaningful and consistent with the author and dont write anything except than the text piece.`,
       },
     ],
     model: "llama-3.3-70b-versatile",

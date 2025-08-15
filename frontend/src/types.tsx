@@ -28,13 +28,17 @@ export type messageTypes =
     msg: string;
   }
   | {
-    type: "RESIGN";
+    type: "ROOM_DELETE";
     roomId: string;
-    playerId: string;
   }
   | {
     type: "MESSAGE";
     roomId: string;
+    playerId: string;
+    msg: string;
+  }
+  | {
+    type: "SERVER_MESSAGE";
     msg: string;
   }
   | {
@@ -58,6 +62,32 @@ export type messageTypes =
     data: {
       index: number; //cursor
       status: boolean;
-    };
+    }
   }
+  | {
+    type: "PING_UPDATE";
+    player: number;
+    opponent: number;
+  }
+  | {
+    type: "ROUND_END",
+    winnerId: string,
+  }
+  | {
+    type: "ROUND_RESTART",
+    roomId: string,
+  }
+  | {
+    type: "TIME_UPDATE",
+    remaining: number,
+  }
+  | {
+    type: "UUID-SET";
+    uuid: string;
+  }
+  | {
+    type: "UUID-GET";
+    uuid: string;
+  };
+
 

@@ -2,6 +2,7 @@ import { create } from "zustand";
 const URL = import.meta.env.VITE_SOCKET_URL ?? "ws://localhost:7654";
 import type { messageTypes } from "../../types";
 import { handleIncoming } from "../handler";
+import { set_toast } from "./toast";
 
 // to track the ws connection 
 type WS_state = {
@@ -37,7 +38,7 @@ export const useSocketStore = create<WS_state>((set, get) => ({
     if (socket && socket.readyState === WebSocket.OPEN) {
       socket.send(JSON.stringify(msg));
     } else {
-      console.warn("Can't send, socket not open bruh.");
+      set_toast("Can't send, socket not open bruh.", "error");
     }
   },
 }));

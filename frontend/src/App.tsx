@@ -7,6 +7,7 @@ import Checker from './assets/components/checker';
 import { useEffect } from 'react';
 import { useSocketStore } from './assets/components/socket';
 import NavigationSetter from './assets/navigate';
+import { set_toast } from './assets/components/toast';
 
 
 function App() {
@@ -16,8 +17,10 @@ function App() {
 
   useEffect(() => {
     connect() // i wanted on terminal mount but then i cant switch to another route as it gets reset 
+    set_toast("connected", 'info');
     return () => {
       disconnect();
+      set_toast('disconnected', 'info');
     };
   }, []);
 

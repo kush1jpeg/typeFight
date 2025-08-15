@@ -19,6 +19,8 @@ export default function handleKeyPress(
     });
     return;
   }
+  const cursor = player.cursor;
+  const playerId = player.gamerId;
   const opponent = Object.values(room.players).find(
     (pre) => pre.gamerId !== playerId,
   );
@@ -32,9 +34,6 @@ export default function handleKeyPress(
     });
     return;
   }
-
-  const cursor = player.cursor;
-  const playerId = player.gamerId;
 
   switch (data.code) {
     case "WORD_BOUNDARY": {
@@ -50,6 +49,7 @@ export default function handleKeyPress(
         split[cursor],
       );
       const dist = fuzzyCheck(split[cursor], data.word.trim());
+      player.fuzzy += dist; // to calc the no of mistakes;
       if (dist > Math.floor(data.word.length * 0.3)) {
         // sending to opponent inorder to squiggle mine cursor on mistakes
         if (opponent) {
@@ -58,10 +58,11 @@ export default function handleKeyPress(
             code: "SQUIGGLE",
             player: playerId,
             data: {
-              index: cursor,
+              index: split[cursor].length + 1,
               status: true,
             },
           });
+          console.log("squiggle");
         }
       } else {
         sendJSON(opponent.socket, {
@@ -69,7 +70,7 @@ export default function handleKeyPress(
           code: "UPDATE",
           player: playerId,
           data: {
-            index: cursor,
+            index: split[cursor].length + 1,
             status: false,
           },
         });

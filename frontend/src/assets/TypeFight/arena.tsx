@@ -1,22 +1,27 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSocketStore } from '../components/socket';
 import { useRoomStore } from '../zustand';
+import WinnerDialog from '../components/restartBox';
 
-
-
-
-export function Fight_arena() {
+type fight = {
+  onRestart: () => void;
+}
+export function Fight_arena({ onRestart }: fight) {
   const sendWS = useSocketStore(s => s.send);
   const roomId = useRoomStore.getState().roomId;
   const sentence = useRoomStore(s => s.sentence);
-  console.log(sentence, "from the arena.tsx");
   const player = useRoomStore.getState().gamerId;
   const [typed, setTyped] = useState(''); //frontend
   const [cursor, setCursor] = useState(0); // frontend
   const inputRef = useRef<HTMLInputElement>(null);
   const mistake = useRoomStore(s => s.mistake);
   const oppCursor = useRoomStore(s => s.Opp_cursor);
+  const winner = useRoomStore(s => s.winner);
+  const [opp_cursor, set_oppCursor] = useState(0);
 
+  useEffect(() => {
+    set_oppCursor(prev => prev + oppCursor);
+  }, [oppCursor]);
 
   useEffect(() => {
     if (mistake) {
@@ -66,13 +71,36 @@ export function Fight_arena() {
     }
   }, [currentWord, sendWS, roomId, player]);
 
+  function onTimeout() {
+    console.log("sending room delete from restart")
+    sendWS(
+      {
+        type: "ROOM_DELETE",
+        roomId,
+      })
+  }
+
+  function Restart() {
+    onRestart();
+    sendWS(
+      {
+        type: "ROUND_RESTART",
+        roomId,
+      })
+  }
+
 
 
 
   const charsPerLine = 200;
   return (
     <>
-      <div className="relative w-full max-w-7xl mx-auto mt-[20vh] font-mono text-4xl leading-[2.2rem] z-50">
+      {winner && (
+        <div className='z-50'>
+          <WinnerDialog winnerName={winner} onTimeout={onTimeout} onRestart={Restart} />
+        </div>
+      )}
+      <div className="relative w-full max-w-7xl mx-auto mt-[20vh] font-mono text-4xl leading-[2.2rem] z-49">
         {/* Invisible focused input */}
         <input
           ref={inputRef}
@@ -85,7 +113,7 @@ export function Fight_arena() {
 
         {/* Typing box */}
         <div
-          className="h-[25rem] overflow-hidden relative z-50"
+          className="h-[25rem] overflow-hidden relative z-49"
           style={{
             lineHeight: "2.3rem", // explicit line height for vertical calc
           }}
@@ -99,7 +127,6 @@ export function Fight_arena() {
           >
             {sentence.split("").map((char: string, idx: number) => {
               let className = "text-gray-400"; // default
-
               if (idx < typed.length) {
                 className = typed[idx] === char ? "text-green-400" : "text-red-500";
               }
@@ -108,7 +135,7 @@ export function Fight_arena() {
                 <span key={idx} className={className} style={{ position: 'relative' }}>
                   {char === " " ? "\u00A0" : char}
                   {idx === cursor && <span className="cursor mr-5 bg-winterGreen" />}
-                  {idx === oppCursor && (
+                  {idx === opp_cursor && (
                     <span
                       className={`cursor mr-5 bg-autumnRed ${mistake ?? "squiggle-once"}`} />
                   )}

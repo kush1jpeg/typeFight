@@ -5,6 +5,7 @@ import { set_toast } from './toast';
 import { Navigate } from 'react-router-dom';
 import { useSocketStore } from './socket';
 import type { messageTypes } from '../../types';
+import { useState } from 'react';
 
 
 export function TerminalUI() {
@@ -19,24 +20,33 @@ export function TerminalUI() {
   const setRoomId = useRoomStore((s) => s.setRoomId)
   const gamerId = useRoomStore((s) => s.gamerId);
   const set_gamerId = useRoomStore((s) => s.setgamerId)
-  const time = useRoomStore((s) => s.time);
-  const set_time = useRoomStore((s) => s.settime)
+  const [time, set_time] = useState<number | null>(null);
   const joined = useRoomStore(S => S.joined)
   const sendWs = useSocketStore(s => s.send);
 
 
-  const checkTime = (e: any) => {
-    const val = e.target.value;
+  const checkTime = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value.trim();
+
+    if (val === "") {
+      set_time(null);
+      return;
+    }
+
+    if (!/^\d+$/.test(val)) {
+      set_toast("Time must be a whole number", "error");
+      return;
+    }
+
     const num = Number(val);
-    if (val === '') {
-      set_time(null)
+
+    if (num <= 0) {
+      set_toast("Time must be greater than 0", "error");
+      return;
     }
-    else if (!/^\d+$/.test(val)) {  // regex ofc by gpt man
-      set_toast("Time must be a number", "error");
-    } else {
-      set_time(num);
-    }
-  }
+    set_time(num);
+  };
+
   const handleSubmit = () => {
     if (!roomId || !roomPass || !gamerId) {
       set_toast("Details not filled", "warn");

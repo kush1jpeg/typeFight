@@ -617,7 +617,7 @@ export default function ASCIIText({
   return (
     <div
       ref={containerRef}
-      className="ascii-text-container z-30"
+      className="ascii-text-container z-40"
       style={{
         position: "absolute",
         width: "100%",

@@ -14,6 +14,7 @@ wsServer.on("connection", (connection: WebSocket, request: IncomingMessage) => {
   console.log(`wsServer connected`);
   const uuid = uuidv4();
   connections.set(uuid, connection);
+  console.log(...connections.keys());
 
   if (!request.url) {
     console.error("Missing URL in WebSocket request.");
@@ -32,5 +33,6 @@ wsServer.on("connection", (connection: WebSocket, request: IncomingMessage) => {
   connection.on("close", () => {
     console.log("WebSocket closed:", uuid);
     // Cleanup if needed
+    connections.delete(uuid);
   });
 });

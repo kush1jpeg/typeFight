@@ -3,6 +3,7 @@ import { playerInterface } from "../types";
 
 //TypeScript classes don’t inherit properties from interfaces — only structure enforcement.
 class Player implements playerInterface {
+  public fuzzy: number;
   public gamerId: string;
   public uuid: string;
   public socket: WebSocket;
@@ -12,10 +13,12 @@ class Player implements playerInterface {
   public words: string[] = [];
   public state: {
     isAlive: string;
-    ping?: number | string;
+    ping: number;
+    lastPong: number;
   };
 
   constructor(gamerId: string, socket: WebSocket, uuid: string) {
+    this.fuzzy = 0;
     this.gamerId = gamerId;
     this.socket = socket;
     this.uuid = uuid;
@@ -24,18 +27,13 @@ class Player implements playerInterface {
     this.ready = false;
     this.state = {
       isAlive: "idle",
-      ping: "connecting",
+      ping: 0,
+      lastPong: 0,
     };
   }
 
   set_typed(typed: string) {
     this.typed += typed;
-  }
-  set_backSpace() {
-    if (this.cursor > 0 && this.typed.length > 0) {
-      this.typed = this.typed.slice(0, -1); // remove last char
-      this.cursor--;
-    }
   }
 
   update_cursorPos(pos: number) {

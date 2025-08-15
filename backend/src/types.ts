@@ -8,11 +8,12 @@ export interface playerInterface {
   cursor: number;
   typed: string | "";
   ready: boolean; // <-- to track inorder to trigger the shite
-  words: Array<string>;
+  fuzzy: number;
   //rating?: number to be implemented when i make my elo based ranking algortihm :)
   state: {
     isAlive: string; //rage quit and disconnect-> will add 10sec counter to reconnect otherwise gg
-    ping?: number | string; // in ms}
+    ping: number; // in ms}
+    lastPong: number;
   };
 }
 export interface Room extends EventEmitter {
@@ -49,17 +50,20 @@ export type messageTypes =
       timestamp: number;
     }
   | {
+      type: "TOKEN_PING";
+      timestamp: number;
+    }
+  | {
       type: "FEEDBACK";
       code: string;
       msg: string;
     }
   | {
-      type: "RESIGN";
+      type: "ROOM_DELETE";
       roomId: string;
-      playerId: string;
     }
   | {
-      type: "GAME_RES";
+      type: "GAME_RES"; // to update about opponent position and squiggle or not!
       code: string;
       player: string;
       data: {
@@ -68,8 +72,17 @@ export type messageTypes =
       };
     }
   | {
+      type: "TIME_UPDATE";
+      remaining: number;
+    }
+  | {
       type: "MESSAGE";
       roomId: string;
+      playerId: string;
+      msg: string;
+    }
+  | {
+      type: "SERVER_MESSAGE";
       msg: string;
     }
   | {
@@ -77,18 +90,25 @@ export type messageTypes =
       sentence: string;
       player1: string;
       player2: string;
+    }
+  | {
+      type: "PING_UPDATE";
+      player: number;
+      opponent: number;
+    }
+  | {
+      type: "ROUND_RESTART"; // to handle in the frontend;
+      roomId: string;
+    }
+  | {
+      type: "ROUND_END";
+      winnerId: string;
+    }
+  | {
+      type: "UUID-SET";
+      uuid: string;
+    }
+  | {
+      type: "UUID-GET";
+      uuid: string;
     };
-/* |
-
-{
-  type: 'ROUND_START';
-  startTime: number;
-}
-|{
-  type: 'CLIENT_READY';
-  roomId: string;
-}
-|{
-  type: 'ROUND_END';
-  winnerId: string;  
-} */

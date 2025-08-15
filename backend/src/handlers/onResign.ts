@@ -1,9 +1,11 @@
 import { sendJSON } from "../gameLogic/helperFunc";
 import { roomManager } from "../gameLogic/tokenHandler";
 import Player from "../player/playerInit";
+import { Room } from "../types";
+import { startPingLoop } from "./onPong";
 
 export function handleDelete(roomId: string): boolean {
-  //if the user deletes
+  //if the time passes...
   roomManager.delete(roomId);
   return !roomManager.has(roomId); //return true if deleted
 }
@@ -30,15 +32,45 @@ export function roundCheck(roomId: string, player: Player) {
   });
   if (allReady) {
     for (const p of Object.values(room.players)) {
+      startPingLoop(p);
       sendJSON(p.socket, {
         type: "FEEDBACK",
         code: "ROUND_START",
         msg: "The round is starting",
       });
     }
-    const currentTime = Date.now();
-    roundTimeCHECK(currentTime);
+    const Time = (room.time + 5) * 1000;
+    roundTimeCHECK(Time, room);
   }
 }
 
-function roundTimeCHECK(time: number) {}
+function roundTimeCHECK(remaining: number, room: Room) {
+  // to bind it first
+  broadcastTimeUpdate();
+  const interval = setInterval(() => {
+    remaining -= 1;
+
+    if (remaining <= 0) {
+      clearInterval(interval);
+
+      const winner = roomManager.getWinner(room);
+      for (const p of Object.values(room.players)) {
+        sendJSON(p.socket, {
+          type: "ROUND_END",
+          winnerId: winner,
+        });
+      }
+    } else {
+      broadcastTimeUpdate();
+    }
+  }, 1000);
+
+  function broadcastTimeUpdate() {
+    for (const p of Object.values(room.players)) {
+      sendJSON(p.socket, {
+        type: "TIME_UPDATE",
+        remaining,
+      });
+    }
+  }
+}

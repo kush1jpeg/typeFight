@@ -1,25 +1,14 @@
 import React, { useEffect, useState } from "react";
 
 type RetroClockProps = {
-  initialTime: number; // in seconds
-  onComplete?: () => void;
+  Time: number; // in seconds
 };
 
-const RetroClock: React.FC<RetroClockProps> = ({ initialTime, onComplete }) => {
-  const [time, setTime] = useState(initialTime);
+const RetroClock: React.FC<RetroClockProps> = ({ Time }) => {
+  const [time, setTime] = useState(Time);
 
-  useEffect(() => {
-    if (time <= 0) {
-      onComplete && onComplete();
-      return;
-    }
-
-    const timer = setInterval(() => setTime((prev) => prev - 1), 1000);
-    return () => clearInterval(timer);
-  }, [time, onComplete]);
-
-  const isFinalFive = time <= 5;
-
+  useEffect(() => { setTime(Time) }, [Time])
+  const isFinalFive = time < 5;
   return (
     <div
       className={`
@@ -33,7 +22,7 @@ const RetroClock: React.FC<RetroClockProps> = ({ initialTime, onComplete }) => {
         text-[#ff00ff]  /* neon magenta text */
         shadow-[0_0_15px_rgba(255,0,255,0.8)]
       `}
-      style={{ minWidth: "120px" }}
+      style={{ minWidth: "130px" }}
     >
       {time}
     </div>

@@ -11,6 +11,10 @@ export function handleIncoming(data: messageTypes) {
   const set_Opponent = useRoomStore.getState().setOpponent;
   const setOpp_cursor = useRoomStore.getState().setOpp_cursor;
   const setMistake = useRoomStore.getState().setMistake;
+  const setWinner = useRoomStore.getState().setWinner;
+  const set_playerPing = useRoomStore.getState().set_player_ping;
+  const set_oppPing = useRoomStore.getState().set_opp_ping;
+  const settime = useRoomStore.getState().settime;
   const playerId = useRoomStore.getState().gamerId;
   switch (data.type) {
     case "FEEDBACK":
@@ -57,8 +61,14 @@ export function handleIncoming(data: messageTypes) {
 
     case "TOKEN_PING":
       {
-        //pong to be be send its like
+        //pong to be be send as it came like-
         sendWs({ type: "TOKEN_PONG", timestamp: data.timestamp });
+      }
+      break;
+
+    case "SERVER_MESSAGE":
+      {
+        useRoomStore.getState().showTaunt(data.msg);
       }
       break;
 
@@ -71,10 +81,33 @@ export function handleIncoming(data: messageTypes) {
       }
       break;
 
+    case "ROUND_END":
+      {
+        console.log("received round end in frontend");
+        setWinner(data.winnerId);
+      }
+      break;
+
     case "GAME_RES":
       {
+        console.log("received gameRes");
         setOpp_cursor(data.data.index);
         setMistake(data.data.status);
+      }
+      break;
+
+    case "PING_UPDATE":
+      {
+        console.log("received ping update");
+        set_oppPing(data.opponent);
+        set_playerPing(data.player);
+      }
+      break;
+
+    case "TIME_UPDATE":
+      {
+        console.log("ontimeupdate");
+        settime(data.remaining);
       }
       break;
 
