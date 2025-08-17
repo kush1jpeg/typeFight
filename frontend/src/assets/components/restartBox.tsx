@@ -15,7 +15,7 @@ const WinnerDialog: React.FC<WinnerDialogProps> = ({ winnerName, onRestart, onTi
       setTimeLeft(prev => {
         if (prev <= 1) {
           clearInterval(timer);
-          // onTimeout();
+          //onTimeout();
           console.log("time over");
           return 0;
         }
@@ -63,7 +63,7 @@ const WinnerDialog: React.FC<WinnerDialogProps> = ({ winnerName, onRestart, onTi
           onClick={onRestart}
           className="mt-2 px-4 py-2 bg-pink-500 hover:bg-pink-400 border-2 border-pink-300 rounded-lg text-white font-bold shadow-md shadow-pink-900"
         >
-          Restart Game
+          Restart
         </button>
 
         {/* Countdown text */}

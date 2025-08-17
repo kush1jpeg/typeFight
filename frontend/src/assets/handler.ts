@@ -17,6 +17,13 @@ export function handleIncoming(data: messageTypes) {
   const settime = useRoomStore.getState().settime;
   const playerId = useRoomStore.getState().gamerId;
   switch (data.type) {
+    case "UUID-SET":
+      {
+        localStorage.setItem("playerUUID", data.uuid);
+        console.log("uuid stored in localStorage");
+      }
+      break;
+
     case "FEEDBACK":
       {
         // for only when player joins an existing room

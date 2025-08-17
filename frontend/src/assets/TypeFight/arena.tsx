@@ -72,7 +72,10 @@ export function Fight_arena({ onRestart }: fight) {
   }, [currentWord, sendWS, roomId, player]);
 
   function onTimeout() {
-    console.log("sending room delete from restart")
+    console.log("sending room delete from restart");
+    setCursor(0);
+    setTyped("");
+    onRestart();
     sendWS(
       {
         type: "ROOM_DELETE",
@@ -82,6 +85,8 @@ export function Fight_arena({ onRestart }: fight) {
 
   function Restart() {
     onRestart();
+    setCursor(0);
+    setTyped("");
     sendWS(
       {
         type: "ROUND_RESTART",

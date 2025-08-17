@@ -9,6 +9,18 @@ import { handleDelete, handleRestart, roundCheck } from "../handlers/onResign";
 import { sendJSON } from "./helperFunc";
 import { handlePingPong } from "../handlers/onPong";
 
+// redis.ts
+import Redis from "ioredis";
+export const redis = new Redis(6379); // its the default dono why i even harcoded it->lol
+redis.on("connect", () => {
+  console.log("Redis server connected");
+});
+
+redis.on("error", (err) => {
+  console.error(" Redis connection error:", err);
+  return;
+});
+
 export const roomManager = new RoomManager();
 
 export async function handleTokens(
@@ -38,7 +50,7 @@ export async function handleTokens(
 
     case "ROOM_DELETE":
       {
-        if (handleDelete(data.roomId)) console.log("Room deleted");
+        if (await handleDelete(data.roomId)) console.log("Room deleted");
       }
       break;
 
@@ -77,13 +89,13 @@ export async function handleTokens(
       if (data.code == "READY") {
         console.log("received ready by the backend");
         const player = roomManager.getPlayerByUUID(uuid);
-        if (player) roundCheck(data.msg, player);
+        if (player) await roundCheck(data.msg, player);
       }
 
       if (data.code == "NO_RESPONSE") {
         const roomId = data.msg;
         const room = roomManager.get(roomId);
-        if (handleDelete(roomId) && room) {
+        if ((await handleDelete(roomId)) && room) {
           for (const p of Object.values(room.players)) {
             sendJSON(p.socket, {
               type: "FEEDBACK",

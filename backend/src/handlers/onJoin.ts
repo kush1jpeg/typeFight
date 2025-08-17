@@ -3,6 +3,7 @@ import { player_Init } from "../player/playerInit";
 import { sendJSON } from "../gameLogic/helperFunc";
 import { RoomManager } from "../room/roomManager";
 import { messageTypes } from "../types";
+import { redis } from "../gameLogic/tokenHandler";
 
 export default async function handleJoin(
   connection: WebSocket,
@@ -20,6 +21,8 @@ export default async function handleJoin(
         code: "ROOM_JOIN",
         msg: "Room joined successfully",
       });
+
+      // to send joining msg to the player
       const otherPlayer = Object.values(room.players).find(
         (p) => p.gamerId !== newPlayer.gamerId,
       );
@@ -31,6 +34,18 @@ export default async function handleJoin(
           code: "OPP_JOINED",
           msg: `Room joined by ${data.gamerId}`,
         });
+
+      // redis-
+      await redis.hset(`player:${uuid}`, {
+        uuid: uuid,
+        gamerId: newPlayer.gamerId,
+        roomId: data.roomId,
+        status: "online",
+        cursor: newPlayer.cursor,
+        fuzzy: newPlayer.fuzzy,
+      });
+
+      await redis.sadd(`room:${data.roomId}:players`, uuid);
 
       // to send all the players about the roomInfo
       console.log(
@@ -52,21 +67,22 @@ export default async function handleJoin(
         console.log("[handleJoin] Waiting for sentence event");
         // Sentence not ready, wait for event with timeout
         try {
-          await new Promise<void>((resolve, reject) => {
+          const sentence = await new Promise<string>((resolve, reject) => {
             const timeout = setTimeout(() => {
               room.removeListener("sentenceReady", onSentenceReady);
               reject(new Error("Timeout waiting for sentence"));
             }, 5000);
 
-            function onSentenceReady() {
+            function onSentenceReady(sen: string) {
               clearTimeout(timeout);
               if (!room) return;
               room.off("sentenceReady", onSentenceReady);
-              resolve();
+              resolve(sen);
             }
 
             room.on("sentenceReady", onSentenceReady);
           });
+          room.sentence = sentence;
         } catch (err) {
           console.warn("Timeout waiting for sentence, proceeding anyway", err);
         }

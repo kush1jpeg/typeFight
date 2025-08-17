@@ -7,26 +7,34 @@ import { set_toast } from "./toast";
 // to track the ws connection 
 type WS_state = {
   ws: WebSocket | null;
-  connect: () => void;
+  connect: () => Promise<WebSocket>;
   disconnect: () => void;
   send: (msg: messageTypes) => void;
 }
 
 export const useSocketStore = create<WS_state>((set, get) => ({
   ws: null,
-  connect: () => {
-    const ws = new WebSocket(URL);
-    ws.onopen = () => console.log("--> Connected to wServer");
+  connect: async () => {
+    return new Promise<WebSocket>((resolve, reject) => {
+      const ws = new WebSocket(URL);
 
-    ws.onmessage = (e) => {
-      const msg = JSON.parse(e.data);
-      console.log("Incoming message -->", msg);
-      handleIncoming(msg);
-    };
+      ws.onopen = () => {
+        console.log("--> Connected to wServer");
+        set({ ws });
+        resolve(ws);
+      };
 
-    ws.onerror = (e) => console.warn("X--> Socket error", e);
+      ws.onmessage = (e) => {
+        const msg = JSON.parse(e.data);
+        console.log("Incoming message -->", msg);
+        handleIncoming(msg);
+      };
 
-    set({ ws });
+      ws.onerror = (e) => {
+        console.warn("X--> Socket error", e);
+        reject(e);
+      };
+    });
   },
   disconnect: () => {
     get().ws?.close(1000, "--> Manual disconnect");
@@ -38,7 +46,7 @@ export const useSocketStore = create<WS_state>((set, get) => ({
     if (socket && socket.readyState === WebSocket.OPEN) {
       socket.send(JSON.stringify(msg));
     } else {
-      set_toast("Can't send, socket not open bruh.", "error");
+      set_toast("Can't send, socket not open in the backend", "error");
     }
   },
 }));

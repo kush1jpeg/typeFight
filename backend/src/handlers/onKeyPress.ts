@@ -2,8 +2,9 @@ import { WebSocket } from "ws";
 import { RoomManager } from "../room/roomManager";
 import { fuzzyCheck, sendJSON } from "../gameLogic/helperFunc";
 import { messageTypes } from "../types";
+import { redis } from "../gameLogic/tokenHandler";
 
-export default function handleKeyPress(
+export default async function handleKeyPress(
   connection: WebSocket,
   data: Extract<messageTypes, { type: "WORD_TYPED" }>,
   roomManager: RoomManager,
@@ -37,7 +38,7 @@ export default function handleKeyPress(
 
   switch (data.code) {
     case "WORD_BOUNDARY": {
-      // This means: player hit space, enter, or moved cursor — commit word
+      // This means: player hit space so commit word
       player.typed += data.word;
 
       // Checking for squiggle
@@ -48,8 +49,22 @@ export default function handleKeyPress(
         "actualWord - ",
         split[cursor],
       );
-      const dist = fuzzyCheck(split[cursor], data.word.trim());
-      player.fuzzy += dist; // to calc the no of mistakes;
+      const dist = fuzzyCheck(split[cursor].trim(), data.word.trim());
+
+      const results = await redis
+        .multi()
+        .hincrby(`player:${player.uuid}`, "fuzzy", dist)
+        .hincrby(`player:${player.uuid}`, "cursor", 1)
+        .exec();
+
+      if (!results) throw new Error("Redis multi failed");
+
+      const newFuzzy = results[0][1] as number; // redis returns responses in the form of array
+      const newCursor = results[1][1] as number;
+
+      player.fuzzy = newFuzzy; // to calc the no of mistakes;
+      player.update_cursorPos(newCursor);
+
       if (dist > Math.floor(data.word.length * 0.3)) {
         // sending to opponent inorder to squiggle mine cursor on mistakes
         if (opponent) {
@@ -58,7 +73,7 @@ export default function handleKeyPress(
             code: "SQUIGGLE",
             player: playerId,
             data: {
-              index: split[cursor].length + 1,
+              index: data.word.length,
               status: true,
             },
           });
@@ -70,15 +85,12 @@ export default function handleKeyPress(
           code: "UPDATE",
           player: playerId,
           data: {
-            index: split[cursor].length + 1,
+            index: data.word.length,
             status: false,
           },
         });
       }
 
-      // Save word and move cursor
-      player.words[cursor] = data.word;
-      player.update_cursorPos(cursor + 1);
       break;
     }
   }

@@ -4,23 +4,47 @@ import { Bounce, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Checker from './assets/components/checker';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSocketStore } from './assets/components/socket';
 import NavigationSetter from './assets/navigate';
 import { set_toast } from './assets/components/toast';
 
 
 function App() {
-
+  const sendWs = useSocketStore(s => s.send)
   const connect = useSocketStore(s => s.connect);
   const disconnect = useSocketStore(s => s.disconnect);
 
+  const waitForOpen = (ws: WebSocket) => {
+    return new Promise<void>((resolve) => {
+      if (ws.readyState === WebSocket.OPEN) return resolve();
+      ws.addEventListener("open", () => resolve(), { once: true });
+    });
+  };
+
+  const hasConnected = useRef(false);
   useEffect(() => {
-    connect() // i wanted on terminal mount but then i cant switch to another route as it gets reset 
-    set_toast("connected", 'info');
+    const setup = async () => {
+      if (hasConnected.current) return;
+      hasConnected.current = true;
+      const ws = await connect(); // make sure connection is established
+      await waitForOpen(ws);
+      set_toast("connected", "info");
+
+      const existingUUID = localStorage.getItem("playerUUID");
+      if (existingUUID) {
+        sendWs({ type: "RECONNECT", uuid: existingUUID });
+      } else {
+        console.log("sending a new uuid request")
+        sendWs({ type: "NEW" });
+      }
+    };
+
+    setup();
+
     return () => {
       disconnect();
-      set_toast('disconnected', 'info');
+      set_toast("disconnected", "info");
     };
   }, []);
 

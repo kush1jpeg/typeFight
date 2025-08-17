@@ -4,6 +4,7 @@ import { generatePara, sendJSON } from "../gameLogic/helperFunc";
 import { RoomManager } from "../room/roomManager";
 import { room_Init } from "../room/roomInit";
 import { messageTypes } from "../types";
+import { redis } from "../gameLogic/tokenHandler";
 
 export default async function handleCreate(
   connection: WebSocket,
@@ -25,6 +26,20 @@ export default async function handleCreate(
     safeTime,
     newPlayer,
   );
+
+  // handling redis
+  await redis.hset(`player:${uuid}`, {
+    // to store the player as a hash
+    uuid: uuid,
+    gamerId: newPlayer.gamerId,
+    roomId: data.roomId,
+    status: "online",
+    cursor: newPlayer.cursor,
+    fuzzy: newPlayer.fuzzy,
+  });
+
+  await redis.sadd(`room:${data.roomId}:players`, uuid); // to track the players linked to the room
+
   roomManager.add(room);
   if (roomManager.has(data.roomId)) {
     sendJSON(connection, {
@@ -32,8 +47,12 @@ export default async function handleCreate(
       code: "ROOM_CREATED",
       msg: "room created successfully",
     });
+  }
+  try {
     const groq_sentence = await generatePara(safeTime); //generate sentences through groq;
     room.setSentence(groq_sentence);
+  } catch (err) {
+    console.error("Sentence generation failed:", err);
   }
   return newPlayer;
 }

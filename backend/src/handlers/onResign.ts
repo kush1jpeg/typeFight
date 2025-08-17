@@ -1,21 +1,42 @@
 import { sendJSON } from "../gameLogic/helperFunc";
-import { roomManager } from "../gameLogic/tokenHandler";
+import { redis, roomManager } from "../gameLogic/tokenHandler";
 import Player from "../player/playerInit";
 import { Room } from "../types";
 import { startPingLoop } from "./onPong";
 
-export function handleDelete(roomId: string): boolean {
+export async function handleDelete(roomId: string): Promise<boolean> {
   //if the time passes...
   roomManager.delete(roomId);
+  const room = roomManager.get(roomId);
+  for (const player of Object.values(room?.players ?? {})) {
+    await redis.srem(`room:${roomId}:players`, player.uuid);
+    await redis.del(`player:${player.gamerId}`);
+  }
   return !roomManager.has(roomId); //return true if deleted
 }
 
-export function handleRestart(roomId: string) {
+export async function handleRestart(roomId: string) {
   //restart
-  roomManager.restart(roomId);
+  await roomManager.restart(roomId);
+  const room = roomManager.get(roomId);
+  if (!room?.players) throw new Error("Room has no players");
+  await redis.hset(`room:${roomId}`, {
+    // to store the room Info as hash
+    roomId,
+    timeLeft: room.time + 5,
+    status: "active",
+    sentence: room.sentence,
+  });
+  const players = Object.values(room.players);
+  for (const player of players) {
+    await redis.hset(`player:${player.uuid}`, {
+      cursor: 0, // or whatever default value
+      fuzzy: 0, // or default
+    });
+  }
 }
 
-export function roundCheck(roomId: string, player: Player) {
+export async function roundCheck(roomId: string, player: Player) {
   const room = roomManager.get(roomId);
   console.log("triggered");
   if (!room?.players) {
@@ -40,14 +61,22 @@ export function roundCheck(roomId: string, player: Player) {
       });
     }
     const Time = (room.time + 5) * 1000;
-    roundTimeCHECK(Time, room);
+    await roundTimeCHECK(Time, room);
   }
+
+  await redis.hset(`room:${roomId}`, {
+    // to store the room Info as hash
+    roomId,
+    timeLeft: room.time + 5,
+    status: "active",
+    sentence: room.sentence,
+  });
 }
 
-function roundTimeCHECK(remaining: number, room: Room) {
+async function roundTimeCHECK(remaining: number, room: Room) {
   // to bind it first
   broadcastTimeUpdate();
-  const interval = setInterval(() => {
+  const interval = setInterval(async () => {
     remaining -= 1;
 
     if (remaining <= 0) {
@@ -62,6 +91,7 @@ function roundTimeCHECK(remaining: number, room: Room) {
       }
     } else {
       broadcastTimeUpdate();
+      await redis.hset(`room:${room.roomId}`, "timeLeft", remaining);
     }
   }, 1000);
 

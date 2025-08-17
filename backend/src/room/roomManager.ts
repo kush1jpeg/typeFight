@@ -2,9 +2,9 @@ import type Player from "../player/playerInit";
 import { connections } from "../server/websocket";
 import { Room } from "../types";
 import { generatePara, sendJSON } from "../gameLogic/helperFunc";
-import { log } from "console";
+import { redis } from "../gameLogic/tokenHandler";
 
-//room manager is added for easier control and clarity otherwise i could have dont manually too
+//room manager is added for easier control and clarity otherwise i could have done manually too
 
 export class RoomManager {
   private rooms = new Map<string, Room>(); //collection of active rooms
@@ -44,12 +44,15 @@ export class RoomManager {
     room.players[gamerId] = player;
   }
 
-  restart(roomId: string) {
+  async restart(roomId: string) {
     const room = this.rooms.get(roomId);
     if (!room) {
       return;
     }
-    generatePara(room.time); // regenerate some sentence using groq or some shite
+    const sentence = await generatePara(room.time); // regenerate some sentence using groq or some shite
+    if (sentence != "") {
+      room.sentence = sentence;
+    }
     for (const playerId in room.players) {
       const player = room.players[playerId];
       player.cursor = 0;

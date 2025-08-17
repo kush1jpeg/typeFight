@@ -1,5 +1,19 @@
+interface playerData {
+  // to store the player as a hash
+  uuid: string;
+  gamerId: string;
+  roomId: string;
+  status: string;
+  cursor: number;
+  fuzzy: number;
+}
 
 export type messageTypes =
+  | {
+    type: "RECONNECT_SUCCESS";
+    player: playerData;
+    roomId: string;
+  }
   | {
     type: "TOKEN_CREATE";
     roomId: string;
@@ -82,12 +96,15 @@ export type messageTypes =
     remaining: number,
   }
   | {
-    type: "UUID-SET";
-    uuid: string;
+    type: "UUID-SET",
+    uuid: string,
   }
   | {
-    type: "UUID-GET";
-    uuid: string;
-  };
+    type: "RECONNECT", // uuid exists in the local storage;
+    uuid: string
+  }
+  | {
+    type: "NEW";    // new player;
+  }
 
 
