@@ -49,6 +49,9 @@ export async function getGroqChatCompletion(time: string) {
     model: "llama-3.3-70b-versatile",
   });
   const text = res?.choices?.[0]?.message.content ?? "[No output text]";
-  console.log(text);
+  console.log(
+    "Preview:",
+    text.substring(0, 50) + (text.length > 50 ? "..." : ""),
+  );
   return text;
 }

@@ -32,19 +32,19 @@ export async function handleTokens(
   switch (data.type) {
     case "TOKEN_JOIN":
       {
-        player = await handleJoin(connection, uuid, data, roomManager);
+        player = await handleJoin(connection, uuid, data);
       }
       break;
 
     case "TOKEN_CREATE":
       {
-        player = await handleCreate(connection, uuid, data, roomManager);
+        player = await handleCreate(connection, uuid, data);
       }
       break;
 
     case "WORD_TYPED":
       {
-        handleKeyPress(connection, data, roomManager);
+        handleKeyPress(connection, data);
       }
       break;
 
@@ -56,7 +56,7 @@ export async function handleTokens(
 
     case "ROUND_RESTART":
       {
-        handleRestart(data.roomId);
+        await handleRestart(data.roomId);
         console.log("Room Restart");
       }
       break;
@@ -89,6 +89,7 @@ export async function handleTokens(
       if (data.code == "READY") {
         console.log("received ready by the backend");
         const player = roomManager.getPlayerByUUID(uuid);
+        console.log("Player name = ", player?.gamerId);
         if (player) await roundCheck(data.msg, player);
       }
 

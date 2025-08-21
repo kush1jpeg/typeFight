@@ -1,16 +1,14 @@
 import { WebSocket } from "ws";
 import { player_Init } from "../player/playerInit";
 import { generatePara, sendJSON } from "../gameLogic/helperFunc";
-import { RoomManager } from "../room/roomManager";
 import { room_Init } from "../room/roomInit";
 import { messageTypes } from "../types";
-import { redis } from "../gameLogic/tokenHandler";
+import { redis, roomManager } from "../gameLogic/tokenHandler";
 
 export default async function handleCreate(
   connection: WebSocket,
   uuid: string,
   data: Extract<messageTypes, { type: "TOKEN_CREATE" }>,
-  roomManager: RoomManager,
 ) {
   let newPlayer = player_Init(data.gamerId, connection, uuid);
 
@@ -38,7 +36,11 @@ export default async function handleCreate(
     fuzzy: newPlayer.fuzzy,
   });
 
+  await redis.expire(`player:${uuid}`, room.time + 90); // to auto expire after 90 seconds
+
   await redis.sadd(`room:${data.roomId}:players`, uuid); // to track the players linked to the room
+
+  await redis.expire(`room:${data.roomId}:players`, room.time + 90);
 
   roomManager.add(room);
   if (roomManager.has(data.roomId)) {

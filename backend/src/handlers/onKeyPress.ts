@@ -1,13 +1,11 @@
 import { WebSocket } from "ws";
-import { RoomManager } from "../room/roomManager";
 import { fuzzyCheck, sendJSON } from "../gameLogic/helperFunc";
 import { messageTypes } from "../types";
-import { redis } from "../gameLogic/tokenHandler";
+import { redis, roomManager } from "../gameLogic/tokenHandler";
 
 export default async function handleKeyPress(
   connection: WebSocket,
   data: Extract<messageTypes, { type: "WORD_TYPED" }>,
-  roomManager: RoomManager,
 ) {
   const room = roomManager.get(data.roomId);
   const player = room?.players[data.playerId];
@@ -73,7 +71,7 @@ export default async function handleKeyPress(
             code: "SQUIGGLE",
             player: playerId,
             data: {
-              index: data.word.length,
+              index: data.word.length + 1,
               status: true,
             },
           });
@@ -85,7 +83,7 @@ export default async function handleKeyPress(
           code: "UPDATE",
           player: playerId,
           data: {
-            index: data.word.length,
+            index: data.word.length + 1,
             status: false,
           },
         });

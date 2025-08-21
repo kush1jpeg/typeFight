@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { sendJSON } from "../gameLogic/helperFunc";
 import { IncomingMessage } from "http";
 import { server } from "./express";
-import { handleTokens, redis } from "../gameLogic/tokenHandler";
+import { handleTokens, redis, roomManager } from "../gameLogic/tokenHandler";
 import { playerData } from "../types";
 
 // to store all the connections with uuid as the key
@@ -47,6 +47,7 @@ wsServer.on("connection", (connection: WebSocket, request: IncomingMessage) => {
               msg: "Room expired",
               code: "ROOM_NOT_FOUND",
             });
+
             // treat as a new player ->
             uuid = uuidv4();
             connections.set(uuid, connection);
@@ -64,6 +65,14 @@ wsServer.on("connection", (connection: WebSocket, request: IncomingMessage) => {
         }
 
         const redisData = await redis.hgetall(`player:${uuid}`);
+        const timeLeft = Number(await redis.hget(`room:${roomId}`, "timeLeft"));
+        const players = await redis.smembers(`room:${roomId}:players`); // [uuid1, uuid2]
+        const oppUuid = players.find((id) => id !== uuid);
+        if (!oppUuid) return;
+        const oppId = roomManager.getPlayerByUUID(oppUuid)?.gamerId;
+        const oppCursor =
+          Number(await redis.hget(`player:${oppUuid}`, "cursor")) || 0;
+        if (!oppCursor || !oppId) return;
 
         const playerData: playerData = {
           uuid: redisData.uuid,
@@ -71,7 +80,9 @@ wsServer.on("connection", (connection: WebSocket, request: IncomingMessage) => {
           roomId: redisData.roomId,
           status: redisData.status,
           cursor: Number(redisData.cursor) || 0,
-          fuzzy: Number(redisData.fuzzy) || 0,
+          oppId: oppId,
+          oppCursor: oppCursor,
+          timeLeft,
         };
         sendJSON(connection, {
           type: "RECONNECT_SUCCESS",

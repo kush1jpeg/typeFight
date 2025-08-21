@@ -8,7 +8,7 @@ interface WinnerDialogProps {
 
 
 const WinnerDialog: React.FC<WinnerDialogProps> = ({ winnerName, onRestart, onTimeout }) => {
-  const [timeLeft, setTimeLeft] = useState(10);
+  const [timeLeft, setTimeLeft] = useState(8);
 
   useEffect(() => {
     const timer = setInterval(() => {

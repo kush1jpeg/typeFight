@@ -11,6 +11,7 @@ export async function handleDelete(roomId: string): Promise<boolean> {
   for (const player of Object.values(room?.players ?? {})) {
     await redis.srem(`room:${roomId}:players`, player.uuid);
     await redis.del(`player:${player.gamerId}`);
+    await redis.del(`room:${roomId}`);
   }
   return !roomManager.has(roomId); //return true if deleted
 }
@@ -29,6 +30,13 @@ export async function handleRestart(roomId: string) {
   });
   const players = Object.values(room.players);
   for (const player of players) {
+    if (player.state.pingInterval) clearInterval(player.state.pingInterval);
+    if (player.state.watchdogInterval)
+      clearInterval(player.state.watchdogInterval);
+    player.cursor = 0;
+    player.fuzzy = 0;
+    player.ready = false;
+    player.typed = "";
     await redis.hset(`player:${player.uuid}`, {
       cursor: 0, // or whatever default value
       fuzzy: 0, // or default
@@ -42,7 +50,11 @@ export async function roundCheck(roomId: string, player: Player) {
   if (!room?.players) {
     return console.log("no player present");
   }
+  console.log("before = ", player.ready);
+  if (player.ready) return; // already ready
   player.set_ready(true);
+  console.log("after = ", player.ready);
+
   const allReady = Object.values(room?.players).every((p) => p.ready); // insane cracked way told by gpt!
   console.log("[🧠 roundCheck]", {
     playerReady: player.ready,
@@ -51,7 +63,17 @@ export async function roundCheck(roomId: string, player: Player) {
       ready: p.ready,
     })),
   });
+
   if (allReady) {
+    await redis.hset(`room:${roomId}`, {
+      // to store the room Info as hash
+      roomId,
+      timeLeft: room.time + 5,
+      status: "active",
+      sentence: room.sentence,
+      winner: null,
+    });
+
     for (const p of Object.values(room.players)) {
       startPingLoop(p);
       sendJSON(p.socket, {
@@ -60,17 +82,9 @@ export async function roundCheck(roomId: string, player: Player) {
         msg: "The round is starting",
       });
     }
-    const Time = (room.time + 5) * 1000;
-    await roundTimeCHECK(Time, room);
+    const Time = room.time + 5;
+    roundTimeCHECK(Time, room);
   }
-
-  await redis.hset(`room:${roomId}`, {
-    // to store the room Info as hash
-    roomId,
-    timeLeft: room.time + 5,
-    status: "active",
-    sentence: room.sentence,
-  });
 }
 
 async function roundTimeCHECK(remaining: number, room: Room) {
@@ -83,6 +97,7 @@ async function roundTimeCHECK(remaining: number, room: Room) {
       clearInterval(interval);
 
       const winner = roomManager.getWinner(room);
+      await redis.hset(`room:${room.roomId}`, "winner", winner);
       for (const p of Object.values(room.players)) {
         sendJSON(p.socket, {
           type: "ROUND_END",

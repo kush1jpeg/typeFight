@@ -15,8 +15,18 @@ export function handleIncoming(data: messageTypes) {
   const set_playerPing = useRoomStore.getState().set_player_ping;
   const set_oppPing = useRoomStore.getState().set_opp_ping;
   const settime = useRoomStore.getState().settime;
+  const set_playerId = useRoomStore.getState().setgamerId;
   const playerId = useRoomStore.getState().gamerId;
   switch (data.type) {
+    case "RECONNECT_SUCCESS":
+      {
+        setOpp_cursor(data.player.oppCursor);
+        set_Opponent(data.player.oppId);
+        set_playerId(data.player.gamerId);
+        useRoomStore.getState().setStart(true);
+        settime(data.player.timeLeft);
+      }
+      break;
     case "UUID-SET":
       {
         localStorage.setItem("playerUUID", data.uuid);

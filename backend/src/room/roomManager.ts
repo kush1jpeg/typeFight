@@ -2,7 +2,6 @@ import type Player from "../player/playerInit";
 import { connections } from "../server/websocket";
 import { Room } from "../types";
 import { generatePara, sendJSON } from "../gameLogic/helperFunc";
-import { redis } from "../gameLogic/tokenHandler";
 
 //room manager is added for easier control and clarity otherwise i could have done manually too
 

@@ -5,7 +5,9 @@ interface playerData {
   roomId: string;
   status: string;
   cursor: number;
-  fuzzy: number;
+  oppId: string;
+  oppCursor: number;
+  timeLeft: number;
 }
 
 export type messageTypes =

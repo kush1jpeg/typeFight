@@ -24,13 +24,13 @@ export function handlePingPong(player: Player, timestamp: number) {
 }
 
 export function startPingLoop(player: Player) {
-  const pingInterval = setInterval(() => {
+  player.state.pingInterval = setInterval(() => {
     const timestamp = Date.now();
     player.socket.send(JSON.stringify({ type: "TOKEN_PING", timestamp }));
   }, 2000);
 
   // Watchdog check every 5 seconds
-  const watchdog = setInterval(() => {
+  player.state.watchdogInterval = setInterval(() => {
     const diff = Date.now() - (player.state.lastPong || 0);
     if (diff > 5000) {
       console.log(`Player ${player.gamerId} timed out. Removing...`);
@@ -39,8 +39,9 @@ export function startPingLoop(player: Player) {
   }, 5000);
 
   function cleanup() {
-    clearInterval(pingInterval);
-    clearInterval(watchdog);
+    // not deleting from redis....
+    clearInterval(player.state.pingInterval);
+    clearInterval(player.state.watchdogInterval);
     roomManager.removePlayer(player);
     connections.delete(player.uuid);
     try {

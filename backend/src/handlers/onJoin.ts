@@ -1,15 +1,13 @@
 import { WebSocket } from "ws";
 import { player_Init } from "../player/playerInit";
 import { sendJSON } from "../gameLogic/helperFunc";
-import { RoomManager } from "../room/roomManager";
 import { messageTypes } from "../types";
-import { redis } from "../gameLogic/tokenHandler";
+import { redis, roomManager } from "../gameLogic/tokenHandler";
 
 export default async function handleJoin(
   connection: WebSocket,
   uuid: string,
   data: Extract<messageTypes, { type: "TOKEN_JOIN" }>,
-  roomManager: RoomManager,
 ) {
   let newPlayer = player_Init(data.gamerId, connection, uuid);
   if (roomManager.has(data.roomId)) {

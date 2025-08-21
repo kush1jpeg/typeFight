@@ -82,7 +82,7 @@ export const useRoomStore = create<RoomState>((set) => ({
       time: 0,
       password: "",
       gamerId: "",
-      joined: false,
+      joined: true,
     }),
   sentence: "",
   Opp_cursor: 0,

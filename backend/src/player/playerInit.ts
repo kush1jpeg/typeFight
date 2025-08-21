@@ -15,6 +15,8 @@ class Player implements playerInterface {
     isAlive: string;
     ping: number;
     lastPong: number;
+    pingInterval?: NodeJS.Timeout;
+    watchdogInterval?: NodeJS.Timeout;
   };
 
   constructor(gamerId: string, socket: WebSocket, uuid: string) {

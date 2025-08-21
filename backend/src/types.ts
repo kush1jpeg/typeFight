@@ -14,6 +14,8 @@ export interface playerInterface {
     isAlive: string; //rage quit and disconnect-> will add 10sec counter to reconnect otherwise gg
     ping: number; // in ms}
     lastPong: number;
+    pingInterval?: NodeJS.Timeout;
+    watchdogInterval?: NodeJS.Timeout; // to track the ping pong timeout -> so much shit for just restart!
   };
 }
 export interface Room extends EventEmitter {
@@ -31,7 +33,9 @@ export interface playerData {
   roomId: string;
   status: string;
   cursor: number;
-  fuzzy: number;
+  oppId: string;
+  oppCursor: number;
+  timeLeft: number;
 }
 
 export type messageTypes =
