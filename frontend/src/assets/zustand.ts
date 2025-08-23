@@ -1,32 +1,5 @@
 import { create } from "zustand";
 
-// to store the current player info in a atom
-
-/* interface playerInterface {
-  gamerId: string;
-  cursor: number;
-  typeSpeed?: number; //wpm logic
-  typed: string | "";
-  //rating?: number to be implemented when i make my elo based ranking algortihm :)
-  state: {
-    isAlive: string; //rage quit and disconnect-> will add 10sec counter to reconnect otherwise gg
-    ping?: number | string; // in ms}
-  };
-}
-
-const defaultPlayer: playerInterface = {
-  gamerId: '',
-  cursor: 0,
-  typed: '',
-  typeSpeed: 0,
-  state: {
-    isAlive: 'alive',
-    ping: 0,
-  },
-};
-
- */
-
 // to track the room state
 type RoomState = {
   reset: () => void;
@@ -68,21 +41,22 @@ export const useRoomStore = create<RoomState>((set) => ({
   reset: () =>
     // to reset the roomState after resign or inactivity or gameEnd
     set({
-      opponent: "",
-      player_ping: 0,
-      opp_ping: 0,
-      mistake: false,
-      Opp_cursor: 0,
       sentence: "",
+      Opp_cursor: 0,
+      opponent: "",
+      winner: null,
       mode: "select",
       token: null,
-      winner: null,
       roomId: "",
+      mistake: false,
       start: false,
       time: 0,
       password: "",
       gamerId: "",
-      joined: true,
+      joined: false,
+      player_ping: 0,
+      opp_ping: 0,
+      taunt: null,
     }),
   sentence: "",
   Opp_cursor: 0,

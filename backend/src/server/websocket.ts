@@ -38,7 +38,8 @@ wsServer.on("connection", (connection: WebSocket, request: IncomingMessage) => {
           });
           return;
         }
-
+        connections.set(uuid, connection);
+        console.log(uuid);
         const roomId = await redis.hget(`player:${uuid}`, "roomId");
         if (roomId) {
           if (!(await redis.sismember(`room:${roomId}:players`, uuid))) {
@@ -65,6 +66,7 @@ wsServer.on("connection", (connection: WebSocket, request: IncomingMessage) => {
         }
 
         const redisData = await redis.hgetall(`player:${uuid}`);
+        console.log("redisData", redisData);
         const timeLeft = Number(await redis.hget(`room:${roomId}`, "timeLeft"));
         const players = await redis.smembers(`room:${roomId}:players`); // [uuid1, uuid2]
         const oppUuid = players.find((id) => id !== uuid);
@@ -73,7 +75,7 @@ wsServer.on("connection", (connection: WebSocket, request: IncomingMessage) => {
         const oppCursor =
           Number(await redis.hget(`player:${oppUuid}`, "cursor")) || 0;
         if (!oppCursor || !oppId) return;
-
+        console.log("sending the reconnect data");
         const playerData: playerData = {
           uuid: redisData.uuid,
           gamerId: redisData.gamerId,

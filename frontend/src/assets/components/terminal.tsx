@@ -40,6 +40,11 @@ export function TerminalUI() {
 
     const num = Number(val);
 
+    if (num >= 90) {
+      set_toast("Time must be less than 90", "error");
+      return;
+    }
+
     if (num <= 0) {
       set_toast("Time must be greater than 0", "error");
       return;

@@ -26,7 +26,6 @@ export const useSocketStore = create<WS_state>((set, get) => ({
 
       ws.onmessage = (e) => {
         const msg = JSON.parse(e.data);
-        console.log("Incoming message -->", msg);
         handleIncoming(msg);
       };
 

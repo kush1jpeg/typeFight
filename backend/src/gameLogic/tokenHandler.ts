@@ -5,7 +5,7 @@ import { messageTypes } from "../types";
 import handleCreate from "../handlers/onCreate";
 import handleKeyPress from "../handlers/onKeyPress";
 import Player from "../player/playerInit";
-import { handleDelete, handleRestart, roundCheck } from "../handlers/onResign";
+import { handleDelete, roundCheck } from "../handlers/onResign";
 import { sendJSON } from "./helperFunc";
 import { handlePingPong } from "../handlers/onPong";
 
@@ -54,21 +54,16 @@ export async function handleTokens(
       }
       break;
 
-    case "ROUND_RESTART":
-      {
-        await handleRestart(data.roomId);
-        console.log("Room Restart");
-      }
-      break;
-
     case "MESSAGE":
       {
+        console.log("reached backend");
         const room = roomManager.get(data.roomId);
         if (!room) return;
         const target = Object.values(room.players).find((p) => {
-          p.gamerId != data.playerId;
+          return p.gamerId != data.playerId;
         });
         if (!target) return;
+        console.log("sending to - ", target.gamerId);
         sendJSON(target.socket, {
           type: "SERVER_MESSAGE",
           msg: data.msg,
@@ -91,6 +86,7 @@ export async function handleTokens(
         const player = roomManager.getPlayerByUUID(uuid);
         console.log("Player name = ", player?.gamerId);
         if (player) await roundCheck(data.msg, player);
+        return;
       }
 
       if (data.code == "NO_RESPONSE") {

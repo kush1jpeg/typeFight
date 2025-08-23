@@ -13,7 +13,7 @@ export default async function handleCreate(
   let newPlayer = player_Init(data.gamerId, connection, uuid);
 
   const safeTime =
-    typeof data.time === "number" && data.time > 0 && data.time <= 300
+    typeof data.time === "number" && data.time > 0 && data.time <= 90
       ? data.time
       : 45;
   const sentence = "";

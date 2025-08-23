@@ -14,6 +14,7 @@ import TauntDisplay from '../components/ taunt.tsx';
 
 
 export function TypeFight() {
+  const [buttonActive, setButtonActive] = useState(true);
   const [count, setCount] = useState(5);  //timer
   const roomId = useRoomStore.getState().roomId;   //.get state does not trigger a render.
   const start = useRoomStore(s => s.start);        //. use this for triggering a render
@@ -29,13 +30,10 @@ export function TypeFight() {
   const opp_Ping = useRoomStore(s => s.opp_ping);
 
 
-  const restart = () => {
-    setCount(5);
-    setBut(true);
-    useRoomStore.getState().reset();
-  }
-
-  const Onsubmit = () => {
+  const onClick = () => {
+    if (!buttonActive) return;
+    setButtonActive(false); // disables further triggers
+    console.log(">>> CLICKED READY once", Date.now());
     if (toastTimeout.current) clearTimeout(toastTimeout.current);
     if (wsTimeout.current) clearTimeout(wsTimeout.current);
     console.log("socket state:",);
@@ -75,7 +73,10 @@ export function TypeFight() {
     const timer = setTimeout(() => {
       setCount((count) => count - 1)   // to not get stale values
     }, 1000);
-    return () => clearTimeout(timer); // cleanup to avoid multiple timers
+    return () => {
+      clearTimeout(timer);
+      setButtonActive(true);
+    } // cleanup to avoid multiple timers
   }, [start, count])
 
 
@@ -99,7 +100,7 @@ export function TypeFight() {
       origin-top
       translate-y-[45px]
       pointer-events-none
-          z-50
+          z-40
     "
         />
 
@@ -119,10 +120,11 @@ export function TypeFight() {
       origin-top
       -translate-x-1/2
       translate-y-[45px]
+          z-50
     "
         >
           {/* UI positioned relative to frame */}
-          <div>
+          <div className='z-50'>
             {/* Emoji Dial */}
             {start && (<>
               <Emoji_Dial />
@@ -135,7 +137,7 @@ export function TypeFight() {
       {/* Confirm button wrapper */}
       {but && (
         <div className="pointer-events-auto fixed bottom-5 right-5 z-50">
-          <ConfirmButton onSubmit={Onsubmit} />
+          <ConfirmButton onClick={onClick} />
         </div>)}
 
       {/* Waiting screen */}
@@ -174,7 +176,7 @@ export function TypeFight() {
                   <PlayerBox name={opponent} ping={opp_Ping} type='opp' />
                 </div>
               </div>
-              <Fight_arena onRestart={restart} />
+              <Fight_arena />
             </>
           )}
         </div>

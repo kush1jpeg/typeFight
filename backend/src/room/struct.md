@@ -19,23 +19,3 @@
 │       ├── handleTyping.ts
 │       └── ...
 
- 
-✅ Frontend Responsibilities
-Render green/red letters based on sentence.
-
-Update the cursor and typed array.
-
-Do not trust the client to declare win/score.
-
-🔁 Backend Responsibilities
-Receive each keystroke or batch.
-
-Validate char-by-char using the ground truth sentence.
-
-Enforce cursor position to detect skipping.
-
-Track accuracy/WPM.
-
-Decide round over and declare winner.
-
-Basically, you fake it on frontend for snappiness, but you trust only the backend to decide outcomes.

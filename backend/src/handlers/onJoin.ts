@@ -68,8 +68,8 @@ export default async function handleJoin(
           const sentence = await new Promise<string>((resolve, reject) => {
             const timeout = setTimeout(() => {
               room.removeListener("sentenceReady", onSentenceReady);
-              reject(new Error("Timeout waiting for sentence"));
-            }, 5000);
+              resolve("the sentence was not able to be generated");
+            }, 10000);
 
             function onSentenceReady(sen: string) {
               clearTimeout(timeout);

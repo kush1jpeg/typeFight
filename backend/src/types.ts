@@ -116,10 +116,6 @@ export type messageTypes =
       opponent: number;
     }
   | {
-      type: "ROUND_RESTART"; // to handle in the frontend;
-      roomId: string;
-    }
-  | {
       type: "ROUND_END";
       winnerId: string;
     }

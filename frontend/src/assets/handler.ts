@@ -85,6 +85,7 @@ export function handleIncoming(data: messageTypes) {
 
     case "SERVER_MESSAGE":
       {
+        console.log("received message in the frontend ", data.msg);
         useRoomStore.getState().showTaunt(data.msg);
       }
       break;
@@ -102,12 +103,12 @@ export function handleIncoming(data: messageTypes) {
       {
         console.log("received round end in frontend");
         setWinner(data.winnerId);
+        settime(0);
       }
       break;
 
     case "GAME_RES":
       {
-        console.log("received gameRes");
         setOpp_cursor(data.data.index);
         setMistake(data.data.status);
       }
@@ -115,7 +116,6 @@ export function handleIncoming(data: messageTypes) {
 
     case "PING_UPDATE":
       {
-        console.log("received ping update");
         set_oppPing(data.opponent);
         set_playerPing(data.player);
       }
@@ -123,7 +123,6 @@ export function handleIncoming(data: messageTypes) {
 
     case "TIME_UPDATE":
       {
-        console.log("ontimeupdate");
         settime(data.remaining);
       }
       break;

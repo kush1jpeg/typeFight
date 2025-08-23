@@ -1,7 +1,7 @@
 import type Player from "../player/playerInit";
 import { connections } from "../server/websocket";
 import { Room } from "../types";
-import { generatePara, sendJSON } from "../gameLogic/helperFunc";
+import { sendJSON } from "../gameLogic/helperFunc";
 
 //room manager is added for easier control and clarity otherwise i could have done manually too
 
@@ -41,25 +41,6 @@ export class RoomManager {
 
   addPlayer(room: Room, gamerId: string, player: Player) {
     room.players[gamerId] = player;
-  }
-
-  async restart(roomId: string) {
-    const room = this.rooms.get(roomId);
-    if (!room) {
-      return;
-    }
-    const sentence = await generatePara(room.time); // regenerate some sentence using groq or some shite
-    if (sentence != "") {
-      room.sentence = sentence;
-    }
-    for (const playerId in room.players) {
-      const player = room.players[playerId];
-      player.cursor = 0;
-      player.typed = "";
-      player.state.isAlive = "alive";
-      player.fuzzy = 0;
-      player.ready = false;
-    }
   }
 
   getOpponentId(room: Room, playerId: string): string | null {

@@ -5,10 +5,10 @@ import React from "react"
 const HOLD_DELAY = 1500 // 1.5 seconds of holding needed to trigger action
 
 type Confirm_type = {
-  onSubmit: () => void;
+  onClick: () => void;
 };
 
-export const ConfirmButton = ({ onSubmit }: Confirm_type) => {
+export const ConfirmButton = ({ onClick }: Confirm_type) => {
   const startTime = React.useRef<null | number>(null)
   const holdIntervalRef = React.useRef<null | number>(null)
 
@@ -21,8 +21,8 @@ export const ConfirmButton = ({ onSubmit }: Confirm_type) => {
       // Check if enough time has elapsed
       if (startTime.current && Date.now() - startTime.current > HOLD_DELAY) {
         // When 2 seconds elapsed clear interval and trigger callback
-        stopCounter()
-        onSubmit()
+        stopCounter();
+        onClick();
       }
     }, 10)
   }

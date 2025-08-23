@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSocketStore } from '../components/socket';
 import { useRoomStore } from '../zustand';
-import WinnerDialog from '../components/restartBox';
+import WinnerDialog from '../components/WinnerBox.tsx';
+import { navigateTo } from '../navigate';
 
-type fight = {
-  onRestart: () => void;
-}
-export function Fight_arena({ onRestart }: fight) {
+
+export function Fight_arena() {
   const sendWS = useSocketStore(s => s.send);
   const roomId = useRoomStore.getState().roomId;
   const sentence = useRoomStore(s => s.sentence);
@@ -72,37 +71,25 @@ export function Fight_arena({ onRestart }: fight) {
   }, [currentWord, sendWS, roomId, player]);
 
   function onTimeout() {
-    console.log("sending room delete from restart");
-    setCursor(0);
-    setTyped("");
-    onRestart();
-    sendWS(
-      {
-        type: "ROOM_DELETE",
-        roomId,
-      })
+    //    console.log("sending room delete");
+    //    sendWS(
+    //      {
+    //        type: "ROOM_DELETE",
+    //        roomId,
+    //      })
+    //    setCursor(0);
+    //    setTyped("");
+    //    const reset = useRoomStore.getState().reset;
+    //    reset();
+    //    navigateTo("/");
   }
-
-  function Restart() {
-    onRestart();
-    setCursor(0);
-    setTyped("");
-    sendWS(
-      {
-        type: "ROUND_RESTART",
-        roomId,
-      })
-  }
-
-
-
 
   const charsPerLine = 200;
   return (
     <>
       {winner && (
         <div className='z-50'>
-          <WinnerDialog winnerName={winner} onTimeout={onTimeout} onRestart={Restart} />
+          <WinnerDialog winnerName={winner} onTimeout={onTimeout} />
         </div>
       )}
       <div className="relative w-full max-w-7xl mx-auto mt-[20vh] font-mono text-4xl leading-[2.2rem] z-49">

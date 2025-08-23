@@ -15,6 +15,7 @@ export class room_Init extends EventEmitter implements Room {
     this.players[player.gamerId] = player;
   }
   setSentence(sen: string) {
+    if (this.sentence) return;
     console.log("[room] Emitting sentenceReady");
     this.sentence = sen;
     this.emit("sentenceReady", sen);

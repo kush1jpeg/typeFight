@@ -90,10 +90,6 @@ export type messageTypes =
     winnerId: string,
   }
   | {
-    type: "ROUND_RESTART",
-    roomId: string,
-  }
-  | {
     type: "TIME_UPDATE",
     remaining: number,
   }
