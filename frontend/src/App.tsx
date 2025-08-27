@@ -8,6 +8,7 @@ import { useEffect, useRef } from 'react';
 import { useSocketStore } from './assets/components/socket';
 import NavigationSetter from './assets/navigate';
 import { set_toast } from './assets/components/toast';
+import { useRoomStore } from './assets/zustand.ts';
 
 
 function App() {
@@ -22,7 +23,7 @@ function App() {
     });
   };
 
-  const hasConnected = useRef(false);
+  const hasConnected = useRef(false); // to act as a guard as react deliberately mounts components twice;
   useEffect(() => {
     const setup = async () => {
       if (hasConnected.current) return;
@@ -34,6 +35,7 @@ function App() {
       const existingUUID = localStorage.getItem("playerUUID");
       if (existingUUID) {
         sendWs({ type: "RECONNECT", uuid: existingUUID });
+        console.log("sending a reconnect request")
       } else {
         console.log("sending a new uuid request")
         sendWs({ type: "NEW" });
@@ -44,6 +46,7 @@ function App() {
 
     return () => {
       disconnect();
+      useRoomStore.getState().setStatus('idle');
       set_toast("disconnected", "info");
     };
   }, []);

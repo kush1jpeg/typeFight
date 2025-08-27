@@ -47,6 +47,7 @@ export function TypeFight() {
   }
 
   useEffect(() => {
+    if (start) setBut(false);
     toastTimeout.current = window.setTimeout(() => {
       set_toast("Detected inactivity", "warn");
     }, 8000);

@@ -5,6 +5,7 @@ import { IncomingMessage } from "http";
 import { server } from "./express";
 import { handleTokens, redis, roomManager } from "../gameLogic/tokenHandler";
 import { playerData } from "../types";
+import { roundTimeCHECK } from "../handlers/onResign";
 
 // to store all the connections with uuid as the key
 export const connections = new Map<string, WebSocket>(); // to display the no of active users!
@@ -25,7 +26,6 @@ wsServer.on("connection", (connection: WebSocket, request: IncomingMessage) => {
   connection.on("message", async (msg) => {
     try {
       const data = JSON.parse(msg.toString());
-      console.log("received by backend", data);
 
       // If this is a reconnect, use existing UUID
       if (data.type === "RECONNECT" && data.uuid) {
@@ -74,7 +74,10 @@ wsServer.on("connection", (connection: WebSocket, request: IncomingMessage) => {
         const oppId = roomManager.getPlayerByUUID(oppUuid)?.gamerId;
         const oppCursor =
           Number(await redis.hget(`player:${oppUuid}`, "cursor")) || 0;
-        if (!oppCursor || !oppId) return;
+        const sentence =
+          (await redis.hget(`room:${roomId}`, "sentence")) ||
+          "No sentence found";
+        if (!oppId) return;
         console.log("sending the reconnect data");
         const playerData: playerData = {
           uuid: redisData.uuid,
@@ -85,12 +88,22 @@ wsServer.on("connection", (connection: WebSocket, request: IncomingMessage) => {
           oppId: oppId,
           oppCursor: oppCursor,
           timeLeft,
+          sentence,
         };
         sendJSON(connection, {
           type: "RECONNECT_SUCCESS",
           player: playerData,
           roomId: playerData.roomId,
         });
+
+        sendJSON(connection, {
+          type: "FEEDBACK",
+          code: "ROUND_START",
+          msg: "The round is starting",
+        });
+
+        const room = roomManager.get(roomId);
+        if (room) roundTimeCHECK(timeLeft, room);
       }
 
       // If this is a new connection and uuid hasn’t been set yet

@@ -66,7 +66,6 @@ export class RoomManager {
 
   broadcastPingUpdate(room: Room) {
     const playersArray = Object.values(room.players);
-    console.log("broadcastPingUpdate");
 
     for (const recipient of playersArray) {
       const opponent = playersArray.find(

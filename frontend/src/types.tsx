@@ -8,6 +8,7 @@ interface playerData {
   oppId: string;
   oppCursor: number;
   timeLeft: number;
+  sentence: string;
 }
 
 export type messageTypes =

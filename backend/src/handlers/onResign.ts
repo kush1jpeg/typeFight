@@ -67,7 +67,7 @@ export async function roundCheck(roomId: string, player: Player) {
   }
 }
 
-async function roundTimeCHECK(remaining: number, room: Room) {
+export async function roundTimeCHECK(remaining: number, room: Room) {
   // to bind it first
   broadcastTimeUpdate();
   const interval = setInterval(async () => {

@@ -41,7 +41,6 @@ export const useSocketStore = create<WS_state>((set, get) => ({
   },
   send: (msg: messageTypes) => {
     const socket = get().ws;
-    console.log("Attempting to send:", msg, "Socket state:", socket?.readyState);
     if (socket && socket.readyState === WebSocket.OPEN) {
       socket.send(JSON.stringify(msg));
     } else {

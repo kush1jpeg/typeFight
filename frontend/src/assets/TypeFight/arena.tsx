@@ -15,12 +15,15 @@ export function Fight_arena() {
   const inputRef = useRef<HTMLInputElement>(null);
   const mistake = useRoomStore(s => s.mistake);
   const oppCursor = useRoomStore(s => s.Opp_cursor);
+  const mineCursor = useRoomStore(s => s.cursor)
   const winner = useRoomStore(s => s.winner);
   const [opp_cursor, set_oppCursor] = useState(0);
 
   useEffect(() => {
     set_oppCursor(prev => prev + oppCursor);
-  }, [oppCursor]);
+    setCursor(mineCursor);
+    setTyped(" ".repeat(mineCursor));
+  }, [oppCursor, mineCursor]);
 
   useEffect(() => {
     if (mistake) {
@@ -71,17 +74,17 @@ export function Fight_arena() {
   }, [currentWord, sendWS, roomId, player]);
 
   function onTimeout() {
-    //    console.log("sending room delete");
-    //    sendWS(
-    //      {
-    //        type: "ROOM_DELETE",
-    //        roomId,
-    //      })
-    //    setCursor(0);
-    //    setTyped("");
-    //    const reset = useRoomStore.getState().reset;
-    //    reset();
-    //    navigateTo("/");
+    console.log("sending room delete");
+    sendWS(
+      {
+        type: "ROOM_DELETE",
+        roomId,
+      })
+    setCursor(0);
+    setTyped("");
+    const reset = useRoomStore.getState().reset;
+    reset();
+    navigateTo("/");
   }
 
   const charsPerLine = 200;

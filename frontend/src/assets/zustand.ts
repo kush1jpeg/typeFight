@@ -4,6 +4,7 @@ import { create } from "zustand";
 type RoomState = {
   reset: () => void;
   winner: string | null;
+  cursor: number;
   sentence: string;
   token: "TOKEN_CREATE" | "TOKEN_JOIN" | null;
   mistake: boolean;
@@ -16,8 +17,11 @@ type RoomState = {
   mode: string;
   opponent: string;
   Opp_cursor: number | 0;
+  status: "connected" | "idle" | "connecting";
+  setStatus: (s: RoomState["status"]) => void;
   player_ping: number;
   set_player_ping: (id: number) => void;
+  setCursor: (id: number) => void;
   opp_ping: number;
   taunt: string | null;
   showTaunt: (emoji: string) => void;
@@ -29,10 +33,10 @@ type RoomState = {
   setgamerId: (pw: string) => void;
   set_token: (pw: "TOKEN_CREATE" | "TOKEN_JOIN") => void; // to track the type of token to be sent
   setJoined: (pId: boolean) => void; // if the player joined or not
-  settime: (time: number) => void; // room time
-  setStart: (p: boolean) => void; // to start the 3sec timer together for every device
-  setMode: (p: string) => void; // to track the mode of the user.
-  setSentence: (sent: string) => void; // to store the sentence
+  settime: (t0ime: number) => void; // room time
+  setStart: (p: boolean) => void; // to start the 5sec timer together for every device
+  setMode: (p0: string) => void; // to track the mode of the user.
+  setSentence: (sent: string) => void; // to store sthe sentence
   setOpponent: (opp: string) => void; //to store the opponent
   setOpp_cursor: (opp: number) => void; // to store the opponents ghost cursor pos.
 };
@@ -42,6 +46,7 @@ export const useRoomStore = create<RoomState>((set) => ({
     // to reset the roomState after resign or inactivity or gameEnd
     set({
       sentence: "",
+      cursor: 0,
       Opp_cursor: 0,
       opponent: "",
       winner: null,
@@ -57,11 +62,15 @@ export const useRoomStore = create<RoomState>((set) => ({
       player_ping: 0,
       opp_ping: 0,
       taunt: null,
+      status: "idle",
     }),
   sentence: "",
   Opp_cursor: 0,
+  status: "idle",
+  setStatus: (s: RoomState["status"]) => set({ status: s }), // for the checker shite
   opponent: "",
   winner: null,
+  cursor: 0,
   mode: "select",
   token: null,
   roomId: "",
@@ -81,6 +90,7 @@ export const useRoomStore = create<RoomState>((set) => ({
     }, 3000);
   },
   set_opp_ping: (ping: number) => set({ opp_ping: ping }),
+  setCursor: (no: number) => set({ cursor: no }),
   set_player_ping: (ping: number) => set({ player_ping: ping }),
   setMistake: (opp: boolean) => set({ mistake: opp }),
   setOpp_cursor: (opp: number) => set({ Opp_cursor: opp }),

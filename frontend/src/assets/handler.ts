@@ -16,17 +16,32 @@ export function handleIncoming(data: messageTypes) {
   const set_oppPing = useRoomStore.getState().set_opp_ping;
   const settime = useRoomStore.getState().settime;
   const set_playerId = useRoomStore.getState().setgamerId;
+  const set_Cursor = useRoomStore.getState().setCursor;
   const playerId = useRoomStore.getState().gamerId;
+
   switch (data.type) {
     case "RECONNECT_SUCCESS":
       {
+        console.log("recived RECONNECT_SUCCESS");
         setOpp_cursor(data.player.oppCursor);
         set_Opponent(data.player.oppId);
         set_playerId(data.player.gamerId);
+        set_Cursor(data.player.cursor);
+        data.player.timeLeft;
         useRoomStore.getState().setStart(true);
         settime(data.player.timeLeft);
+        useRoomStore.getState().setJoined(true);
+        set_Sentence(data.player.sentence);
+        const roomId = data.roomId;
+        useRoomStore.getState().setRoomId(roomId);
+        useRoomStore.getState().setStatus("connected");
+        console.log("AFTER setStatus:", useRoomStore.getState().status);
+        if (roomId) {
+          navigateTo(`/room/${roomId}`);
+        }
       }
       break;
+
     case "UUID-SET":
       {
         localStorage.setItem("playerUUID", data.uuid);
@@ -38,8 +53,9 @@ export function handleIncoming(data: messageTypes) {
       {
         // for only when player joins an existing room
         if (data.code === "ROOM_JOIN") {
-          set_toast(data.msg, "success");
           useRoomStore.getState().setJoined(true);
+          useRoomStore.getState().setStatus("connected");
+
           return;
         }
         if (data.code === "OPP_JOINED") {
@@ -50,6 +66,7 @@ export function handleIncoming(data: messageTypes) {
 
         if (data.code === "ROOM_CREATED") {
           console.log("room created");
+          useRoomStore.getState().setStatus("connected");
           set_toast(data.code, "success");
           return;
         }
@@ -102,8 +119,8 @@ export function handleIncoming(data: messageTypes) {
     case "ROUND_END":
       {
         console.log("received round end in frontend");
-        setWinner(data.winnerId);
         settime(0);
+        setWinner(data.winnerId);
       }
       break;
 

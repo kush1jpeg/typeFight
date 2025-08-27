@@ -19,7 +19,6 @@ export const navigateTo = (path: string) => {
 
 export default function NavigationSetter() {
   const navigate = useNavigate();
-
   useEffect(() => {
     setNavigator(navigate);
   }, [navigate]);

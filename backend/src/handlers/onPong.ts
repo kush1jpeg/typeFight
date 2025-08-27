@@ -5,11 +5,8 @@ import { connections } from "../server/websocket";
 export function handlePingPong(player: Player, timestamp: number) {
   //  simple ping pong methd to calculate the ping;
   try {
-    console.log("reached handlePingPong()");
-
     if (typeof timestamp === "number") {
       const ping = Date.now() - timestamp;
-      console.log(ping, "-ping", "timestamp-", timestamp);
       player.update_ping(ping);
       player.state.ping;
       player.setIsAlive("alive");
