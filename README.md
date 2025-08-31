@@ -1,23 +1,22 @@
+┌──────────────────────────────────────────────────┐
 # 🦑 typeFight  
 
-a not needed two player typing game.  
-built for pain, and accidental learning.  
+- a not needed two player typing game.  
+- built for pain, and accidental learning.  
+- not a productivity tool.  
+- not a shitty tutorial-followed project.  
+- just raw websockets, redis, and some free time.  
 
-not a productivity tool.  
-not a shitty tutorial-followed project.  
-just raw websockets, redis, and some free time.  
-
+└─────────────────────────────────┘
 ---
 
 ## ⚙️tech stack  
-- 3js (for that cool retro themed 3d landing environment)
-- react (for unicorn like frontend)  
-- node.js (backjoint's pain)  
-- tailwind (for makeup of that unicorn)  
-- zustand (some eazy state management)  
-- redis (where all my bugs go to hide)  
-
-[frontend] ⇆ [websocket] ⇆ [backend] ⇆ [redis]  
+- [![Three.js](https://skillicons.dev/icons?i=threejs)](https://threejs.org/) → 3js (for that cool retro themed 3d landing environment)  
+- [![React](https://skillicons.dev/icons?i=react)](https://react.dev/) → react (for unicorn like frontend) 
+- [![Node.js](https://skillicons.dev/icons?i=nodejs)](https://nodejs.org/) → node.js (backjoint's pain)   
+- [![TailwindCSS](https://skillicons.dev/icons?i=tailwind)](https://tailwindcss.com/) → tailwind (for makeup of that unicorn)  
+- [<img src="https://zustand-demo.pmnd.rs/favicon.ico" width="50"/>](https://github.com/pmndrs/zustand) → tiny state manager, big relief  
+- [![Redis](https://skillicons.dev/icons?i=redis)](https://redis.io/) → redis (where all my bugs go to hide)  
 
 ---
 
@@ -27,7 +26,10 @@ just raw websockets, redis, and some free time.
 - backend judges you like the old gaming days → dumps state into redis(to reconnect) + a local roomManager  
 - u type shit instant L at the backend using  *Levenshtein distance* (a jargon to just check the no of diff chars in two strings).  
 - real-time opponent cursor updates in the form of ghost cursor to give esports like feel.
-- ping of both the players to make it feel as authentic as her :)  
+- ping of both the players to make it feel as authentic as her :) 
+
+
+ 
 
 ---
 
